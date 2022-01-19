@@ -1,0 +1,30 @@
+{% include "admin_header.html" %}
+<div id="myitems-root-cont">
+    {% for item in item_ls %}
+        <div id="item-card-{{item.item_id}}" class="card ">
+            <div class="card-body">
+                <h5 class="card-title">name:{{ item.name }}</h5>
+                <p class="card-text">description:{{ item.description }}</p>
+               <div>
+                    {#<button id="delete-btn-{{item.item_id}}" onlclick="delete(this)" value="{{item.item_id}}">Delete</button>#}
+                    <a id="delete-button" href='http://localhost:3307/item/delete?item_id={{item.item_id}}' class="btn btn-primary">Delete</a>
+               <a id="delete-button" href='http://localhost:3307/item/unflag_inappropriate?item={{item.item_id}}' class="btn btn-primary">Not Inappropriate</a> 
+							 </div>
+            </div>
+            <div>{{item}}</div>
+        </div>
+
+    {% endfor %}
+</div>
+
+{% include "admin_footer.html" %}
+
+
+<!-- 
+
+mapping api's
+ -->
+
+ {# 
+ if item has no auction details, have  a create auction button for it.
+  #}

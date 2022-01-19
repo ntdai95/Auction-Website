@@ -1,0 +1,21 @@
+{% include "header.html" %}
+
+<div id="myitems-root-cont">
+    {% for item in watchlist_ls %}
+        <div class="card ">
+            <div class="card-body">
+            <h5 class="card-title">{{ item.name }}</h5>
+            <p class="card-text">{{ item.description }}</p>
+            <p class="card-text">{{ item.price }}</p>
+            <p class="card-text">{{ item.status }}</p>
+					  <form action="/watchlist/watching" method="POST">
+							<input type="hidden" name="user_id" class="user-id-input">
+							<input type="hidden" name="item_id" value={{item.item_id}}>
+							<input type="submit" value="delete" class="btn btn-warning">
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+{# <script src="{{url_for('static', filename='js/auction.js')}}"></src> #}
+{% include "footer.html" %}

@@ -1,0 +1,43 @@
+{% include "header.html" %}
+
+<div id="auction-root-cont">
+    <h1>{{item.name}}</h1>
+        <div class="card ">
+            <img class="card-img-top" style="
+                width: 200px;
+                height: 15vw;
+                object-fit: cover;" src="static/images/250px-Nintendo-Game-Boy-Advance-Purple-FL.jpeg" alt="Card image cap">
+            <div class="card-body">
+            <h5 class="card-title">{{ item.name }}</h5>
+            <p class="card-text">{{ item.auction_type }}</p>
+            <p class="card-text">{{ item.description }}</p>
+            <p class="card-text">{{ item.price }}</p>
+            <p class="card-text">{{ item.current_bid }}</p>
+            <p class="card-text">{{ item.auction_start_time }}</p>
+            <p class="card-text">{{ item.auction_endtime }}</p>
+            <p class="card-text">{{ item.status }}</p>
+            <p class="card-text">{{ item.categories }}</p>
+            <a href="/items/flag/{item.id}">Flag item</a>
+            {% if item.status=="on" %}
+            <a href='{{ item.auction_html }}' class="btn btn-primary">go to auction</a>
+            {% endif %}
+            <a href='{{ item.auction_html }}' class="btn btn-primary">go to auction</a>
+
+            {# {% if user.admin %}
+            <button class="btn btn-danger">stop</button>
+            {% endif %} #}
+            </div>
+        </div>
+        {# <a href src="{{url_for('view_auction',auction_id=item.auction_id)}}">go to auction</a> #}
+        <div id="bid-cont">
+            <h3>Current bid: {{item.current_bid}}</h3>
+            <form>
+                <label for="bid">bid</label>
+                <input type="text" name="bid" id="bid">
+                <input class="btn btn-success" type="submit" value="Make Bid!">
+            </form>
+        </div>
+</div>
+	<script src="{{url_for('static', filename='js/item.js')}}"></script>
+
+{% include "footer.html" %}

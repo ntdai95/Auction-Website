@@ -1,0 +1,21 @@
+{% include "header.html" %}
+
+{# <a href="{{ url_for('admin_categories') }}" class="btn btn-primary">categories</a>
+<a href="{{ url_for('admin_users') }}" class="btn btn-primary">user</a>
+<a href="{{ url_for('admin_support_messages') }}" class="btn btn-primary">support messages</a>
+ #}
+
+{% for i in category_ls%}
+<div>{{i["name"]}}</div>
+<form action="/admin/categories" method="POST">
+    <input type="hidden" value="{{i['id']}}">
+    <input type="submit" value="delete {{i['id']}}">
+<form>
+{% endfor %}
+
+
+<script src="{{url_for('static', filename='js/auction.js')}}"></script>
+
+
+
+{% include "footer.html" %}

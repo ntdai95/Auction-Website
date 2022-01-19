@@ -1,0 +1,62 @@
+{% include "header.html" %}
+{{ JSGlue.include() }}
+
+<div id="search-root-cont">
+    <form action="/search" method="POST">
+        <label for="search">What are you looking for?</label>
+        <input type="text" name="search" id="search" placeholder="property1:value1; property2:value2">
+        <input type="submit" value="GO!">
+    </form>
+    {% for item in item_ls %}
+     <div class="card ">
+            <img class="card-img-top" style="
+                width: 200px;
+                height: 15vw;
+                object-fit: cover;" src="static/images/250px-Nintendo-Game-Boy-Advance-Purple-FL.jpeg" alt="Card image cap">
+            <div class="card-body">
+            <h5 class="card-title">{{ item.name }}</h5>
+            <p class="card-text">{{ item.description }}</p>
+            <p class="card-text">{{ item.price }}</p>
+            {# <p class="card-text">{{ item.current_bid }}</p> #}
+            {% if "auction_info" in item %}}
+            <p class="card-text">{{ item.auction_info.auction_start_time }}</p>
+            <p class="card-text">{{ item.auction_info.auction_endtime }}</p>
+            <p class="card-text">{{ item.status }}</p>
+            <p class="card-text">{{ item.categories }}</p>
+            <a id="goto-auction-button" href='http://localhost:3309/auction/{{item.auction_info.auction_id}}' class="btn btn-primary">'go to auction'</a>
+            {% endif %}
+            {#{{item}}#}
+            {% if item.status=="on" %}
+    
+            <a href='{{ item.html }}' class="btn btn-primary">go to auction</a>
+            {% endif %}
+            <a id="buyNow-button" href='http://localhost:3305/cart/addCart/{{item.item_id}}' class="btn btn-primary">'Buy now'</a>
+
+						<a id="inapp-button" href='http://localhost:3307/item/report_inappropriate?item_id={{item.item_id}}' class="btn btn-primary">'Report Inappropriate'</a>
+ 
+
+					<a id="counter-button" method="POST" href='http://localhost:3307/item/report_counterfeit?item_id={{item.item_id}}' class="btn btn-primary">'Report Counterfeit'</a>
+
+						<a class="need_id" id="add-watch-button" method="POST" href='http://localhost:3311/watchlist/add?item_id={{item.item_id}}&user_id=' class="btn btn-primary">Add to Watchlist</a>
+
+						<a class="need_id" id="remove-watch-button" method="POST" href='http://localhost:3311/watchlist/remove?item_id={{item.item_id}}&user_id=' class="btn btn-primary"> Remove from Watchlist</a>
+						
+            
+						<a id="goto-auction-button" href='http://localhost:3307/item/{{item.item_id}}' class="btn btn-primary">'item page'</a>
+            {# change out to item_id once item_id has been confirmed working #}
+
+            
+            </div>
+						<form action="close/auction" method="POST">
+            <input type="hidden" name="{{ item.auction_id }}">
+            <input type="submit" value="close auction">
+        </div>
+    {% endfor %}
+</div>
+    <script src="{{ url_for('static', filename='js/header.js')}}"></script> 
+    <script src="{{url_for('static', filename='js/buyNow.js')}}"></script>
+    <script src="{{url_for('static', filename='js/search.js')}}"></script>
+
+
+
+{% include "footer.html" %}

@@ -1,0 +1,21 @@
+{% include "header.html" %}
+
+<div id="auction-root-cont">
+    <h1>Create New item</h1>
+    <form action="/create-item" method="POST">
+        <label for="name" required>Item Name</label>
+        <input name="name">
+        <label for="description" required>Item description</label>
+        <input name="description">
+        <label for="price" >price</label>
+        <input name="price" required>
+        <label for="categories" required>Category</label>
+        <input name="categories">
+        <input type="hidden" name="user_id" id="user-id" required>
+        <button type="submit">Add Item</button>
+    </form>
+</div>
+<script src="{{url_for('static', filename='js/create-item.js')}}"></script>
+
+
+{% include "footer.html" %}
