@@ -1,0 +1,36 @@
+{% include "header.html" %}
+<h2>Cart</h2>
+
+{{cart_ls}}
+<div id="myitems-root-cont">
+    {% for item in cart_ls %}
+        <div id="item-card-{{item.item_id}}" class="card ">
+            <div class="card-body">
+         <!--<img src="rubberduck.jpg" alt="Coding duck">-->
+            <h5 class="card-title">{{ item.name }}</h5>
+            <p class="card-text">{{ item.description }}</p>
+            <p class="card-text">{{ item.price }}</p>
+            <p class="card-text">{{ item.categories }}</p>
+            </div>
+            <div>
+
+           <a id="delete-button" href='http://localhost:3309/cart/delete/{{item.item_id}}' class="btn btn-primary">'Delete this item'</a>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+</form>
+<div id="total">
+    <h3>Total Amount: {{ total }}</h3>
+</div>
+    <a id="order-button" href='{{ url_for("order",user_id=None) }}' class="btn btn-primary">'proceed with order'</a>
+
+
+
+<script src="{{url_for('static', filename='js/cart.js')}}"></script>
+
+
+{% include "footer.html" %} 
+
+{# https://stackoverflow.com/questions/15029016/calculating-totals-when-clicking-checkboxes #}

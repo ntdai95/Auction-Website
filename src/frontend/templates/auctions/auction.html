@@ -1,0 +1,44 @@
+{% include "header.html" %}
+
+<div id="myitems-root-cont">
+            <h5 class="card-title">Name:{{ item.name }}</h5>
+            <p class="card-text">{{ item.auction_type }}</p>
+            <p class="card-text">description:{{ item.description }}</p>
+            {# <p class="card-text">{{ item.price }}</p> #}
+            {% if item.curr_bid %}
+            <p class="card-text">highest bid:{{ item.curr_bid }}</p>
+            {% else %}
+            <p class="card-text">{{ item.auction_type }}</p>
+            <p class="card-text">highest bid: no bids yet</p>
+            {% endif %}
+            <p class="card-text">auction start:{{ item.auction_start }}</p>
+            <p class="card-text">auction end:{{ item.auction_end }}</p>
+            <p class="card-text">auction status:{{ item.auction_status }}</p>
+            </div>
+            <div id="quick bid">
+                <h4>quick bid</h4>
+                <form action="/auction/{{item.auction_id}}" method="POST">
+                    <label for="bid">bid</label>
+                    <input type="text" name="bid_price" id="bid" required>
+                    <input type="hidden" name="user_id" id="user-id" required>
+                    <input type="hidden" name="auction_id" id="auction_id" value="{{ item.auction_id }}">
+                    <input class="btn btn-success" type="submit" value="Make Bid!">
+                </form>
+            </div>
+        </div>
+</div>
+<div id="admin-console">
+    <form action="/auction" method="POST">
+        <input type="hidden" name="action" value="close">
+        <input type="text" name="auction_id" value="{{item.auction_id}}">
+        <input class="btn btn-outline-warning" type="submit" value="close auction">
+    </form>
+</div>
+
+<div>just a tesst</div>
+<script src="{{url_for('static', filename='js/bidding.js')}}"></script>
+<script src="{{url_for('static', filename='js/auction.js')}}"></script>
+
+
+
+{% include "footer.html" %}

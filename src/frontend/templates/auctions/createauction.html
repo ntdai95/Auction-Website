@@ -1,0 +1,31 @@
+{% include "header.html"%}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js" integrity="sha512-T/tUfKSV1bihCnd+MxKD0Hm1uBBroVYBOYSk1knyvQ9VyZJpc/ALb4P0r6ubwVPSGB2GvjeoMAJJImBG12TiaQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.standalone.min.css" integrity="sha512-TQQ3J4WkE/rwojNFo6OJdyu6G8Xe9z8rMrlF9y7xpFbQfW5g8aSWcygCQ4vqRiJqFsDsE1T6MoAOMJkFXlrI9A==" crossorigin="anonymous" />
+<script src="{{url_for('static', filename='js/create-auction.js')}}"></script>
+<h2>New Auction</h1>
+    {{ item.name }}
+    <!-- {{item.picture}} -->
+    
+    <form action="/create-auction" method="POST">
+        <select id="auction-type" name="auction_type">
+            <option value="FB">First Bid Auction</option>
+            <option value="SB">Second Bid Auction</option>
+            <option value="BN">Buy now</option>
+        </select>
+        <input type='hidden' name="item_id" value={{item.item_id}} >
+
+        <label for="start_date">Auction start date:</label>
+        <input type="date" id="start" name="start_date">
+        <label for="start_time">Auction start time</label>
+        <input type="time" id="start-time" name="start_time">
+        <label for="end_date">Auction end date:</label>
+        <input type="date" id="end" name="end_date">
+        <label for="end_time">Auction end time</label>
+        <input type="time" id="end-time" name="end_time">
+        <input type="text" hidden="true" name="item_id" value="{{ item.id }}">
+        <input id="input-user-id" type="text" hidden="true" name="user_id">
+        <input type="submit" value="Create Auction">
+    </form>
+    <script src="{{url_for('static', filename='js/create-auction.js')}}"></script>
+{% include "footer.html"%}

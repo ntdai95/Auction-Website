@@ -1,0 +1,239 @@
+version: "3.9"
+networks:
+    netBackEnd:
+     driver: bridge
+     ipam:
+       driver: default
+
+services:
+  itemsdb:
+    build: 
+      context: ./
+      dockerfile: Dockerfile_MySQL
+    container_name: itemsdb
+    networks:
+      - netBackEnd
+    volumes:
+      - ./item:/docker-entrypoint-initdb.d
+    environment:
+      MYSQL_ROOT_USER: root
+      MYSQL_ROOT_PASSWORD: items
+      MYSQL_DATABASE: items
+      MYSQL_USER: items
+      MYSQL_PASSWORD: items
+      MYSQL_TCP_PORT: 3317
+  
+  items:
+    build: 
+      context: ./
+      dockerfile: Dockerfile_App
+    container_name: items
+    networks:
+      - netBackEnd
+    ports:
+      - 3307:3307
+    links:
+      - itemsdb
+    working_dir: /AuctionWebsite/src/items/core/
+    command: "flask run"
+    environment:
+      FLASK_APP : restful_items.py
+      FLASK_RUN_PORT: 3307
+      FLASK_RUN_HOST: 0.0.0.0
+      FLASK_ENV: development
+      WORKING_DIRECTORY: /AuctionWebsite/src/items/core/
+  
+  usersdb:
+    build: 
+      context: ./
+      dockerfile: Dockerfile_MySQL
+    container_name: usersdb
+    networks:
+      - netBackEnd
+    volumes:
+      - ./user:/docker-entrypoint-initdb.d
+    environment:
+      MYSQL_ROOT_USER: root
+      MYSQL_ROOT_PASSWORD: user
+      MYSQL_DATABASE: user
+      MYSQL_USER: user
+      MYSQL_PASSWORD: user
+      MYSQL_TCP_PORT: 3322
+  
+  users:
+    build: 
+      context: ./
+      dockerfile: Dockerfile_App
+    container_name: users
+    networks:
+      - netBackEnd
+    ports:
+      - 3312:3312
+    links:
+      - usersdb
+    working_dir: /AuctionWebsite/src/users/
+    command: "flask run"
+    environment:
+      FLASK_APP : user.py
+      FLASK_RUN_PORT: 3312
+      FLASK_RUN_HOST: 0.0.0.0
+      WORKING_DIRECTORY: /AuctionWebsite/src/users/
+
+  auctionsdb:
+    build: 
+      context: ./
+      dockerfile: Dockerfile_MySQL
+    container_name: auctionsdb
+    networks:
+      - netBackEnd
+    volumes:
+      - ./auction:/docker-entrypoint-initdb.d
+    environment:
+      MYSQL_ROOT_USER: root
+      MYSQL_ROOT_PASSWORD: auctions
+      MYSQL_DATABASE: auctions
+      MYSQL_USER: auctions
+      MYSQL_PASSWORD: auctions
+      MYSQL_TCP_PORT: 3328
+  
+  auctions:
+    build: 
+      context: ./
+      dockerfile: Dockerfile_App
+    container_name: auctions
+    networks:
+      - netBackEnd
+    ports:
+      - 3318:3318
+    links:
+      - auctionsdb
+    working_dir: /AuctionWebsite/src/auctions/
+    command: "flask run"
+    environment:
+      FLASK_APP : restful_auctions.py
+      FLASK_RUN_PORT: 3318
+      FLASK_RUN_HOST: 0.0.0.0
+      FLASK_ENV: development
+      WORKING_DIRECTORY: /AuctionWebsite/src/auctions/
+  
+  transactionsdb:
+    build: 
+      context: ./
+      dockerfile: Dockerfile_MySQL
+    container_name: transactionsdb
+    networks:
+      - netBackEnd
+    volumes:
+      - ./transaction:/docker-entrypoint-initdb.d
+    environment:
+      MYSQL_ROOT_USER: root
+      MYSQL_ROOT_PASSWORD: transaction
+      MYSQL_DATABASE: transaction
+      MYSQL_USER: transaction
+      MYSQL_PASSWORD: transaction
+      MYSQL_TCP_PORT: 3315
+  
+  transactions:
+    build: 
+      context: ./
+      dockerfile: Dockerfile_App
+    container_name: transaction
+    networks:
+      - netBackEnd
+    ports:
+      - 3305:3305
+    links:
+      - transactionsdb
+    working_dir: /AuctionWebsite/src/transactions/
+    command: "flask run"
+    environment:
+      FLASK_APP : restful_transaction.py
+      FLASK_RUN_PORT: 3305
+      FLASK_RUN_HOST: 0.0.0.0
+      WORKING_DIRECTORY: /AuctionWebsite/src/transactions/
+  
+  watchlistdb:
+    build: 
+      context: ./
+      dockerfile: Dockerfile_MySQL
+    container_name: watchlistdb
+    networks:
+      - netBackEnd
+    volumes:
+      - ./watchlist:/docker-entrypoint-initdb.d
+    environment:
+      MYSQL_ROOT_USER: root
+      MYSQL_ROOT_PASSWORD: watchlist
+      MYSQL_DATABASE: watchlist
+      MYSQL_USER: watchlist
+      MYSQL_PASSWORD: watchlist
+      MYSQL_TCP_PORT: 3321
+  
+  watchlist:
+    build: 
+      context: ./
+      dockerfile: Dockerfile_App
+    container_name: watchlist
+    networks:
+      - netBackEnd
+    ports:
+      - 3311:3311
+    links:
+      - watchlistdb
+    working_dir: /AuctionWebsite/src/watchlist/
+    command: "flask run"
+    environment:
+      FLASK_APP : restful_watchlist.py
+      FLASK_RUN_PORT: 3311
+      FLASK_RUN_HOST: 0.0.0.0
+      WORKING_DIRECTORY: /AuctionWebsite/src/watchlist/
+  frontend:
+    build: 
+      context: ./
+      dockerfile: Dockerfile_App
+    container_name: frontend
+    networks:
+      - netBackEnd
+    ports:
+      - 3309:3309
+    working_dir: /AuctionWebsite/src/frontend/
+    command: "flask run"
+    environment:
+      FLASK_APP : index.py
+      FLASK_RUN_PORT: 3309
+      FLASK_RUN_HOST: 0.0.0.0
+      FLASK_ENV: development
+      WORKING_DIRECTORY: /AuctionWebsite/src/frontend/
+  
+  messagesmongo:
+    build:
+      context: ./
+      dockerfile: Dockerfile_Mongo
+    container_name: messagesmongo
+    networks:
+      - netBackEnd
+    ports: 
+      - 3313:3313
+    volumes:
+      - ./init:/mountscript
+    command: ["--bind_ip_all"]
+    working_dir: /AuctionWebsite/src/messages/
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: messagesMongo
+      MONGO_INITDB_ROOT_PASSWORD: messagesMongo
+      WORKING_DIRECTORY: /AuctionWebsite/src/messages/
+
+  messagesrabbitmq:
+    build:
+      context: ./
+      dockerfile: Dockerfile_RabbitMQ
+    container_name: messagesrabbitmq
+    networks:
+      - netBackEnd
+    ports: 
+      - 3314:3314
+    volumes:
+      - ./init:/mountscript
+    working_dir: /AuctionWebsite/src/messages/
+    environment:
+      WORKING_DIRECTORY: /AuctionWebsite/src/messages/ 

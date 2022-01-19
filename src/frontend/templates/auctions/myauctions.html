@@ -1,0 +1,45 @@
+{% include "header.html" %}
+
+<div id="myitems-root-cont">
+    {% for item in auction_ls %}
+        <div class="card ">
+            <img class="card-img-top" style="
+                width: 200px;
+                height: 15vw;
+                object-fit: cover;" src="static/images/250px-Nintendo-Game-Boy-Advance-Purple-FL.jpeg" alt="Card image cap">
+            <div class="card-body">
+            <h5 class="card-title">{{ item.item_id }}</h5>
+            <p class="card-text">{{ item.auction_type }}</p>
+            <p class="card-text">{{ item.current_bid }}</p>
+            <p class="card-text">{{ item.price }}</p>
+            <p class="card-text">{{ item.auction_id }}</p>
+            <p class="card-text">{{ item.auction_start }}</p>
+            <p class="card-text">{{ item.auction_end }}</p>
+            <p class="card-text">{{ item.auction_status }}</p>
+            {% if item.status=="on" %}
+            <a href='{{ item.html }}' class="btn btn-primary">go to auction</a>
+            {% endif %}
+            </div>
+            {#<div id="quick bid">
+                <h4>quick bid</h4>
+                <form action="/my-auctions" method="POST">
+                    <label for="bid">bid</label>
+                    <input type="number" name="bid_price" id="bid" step="0.10">
+                    <input type="hidden" name="auction_id">
+                    <input type="hidden" name="user_id">
+                    <input class="btn btn-success" type="submit" value="Make Bid!">
+                </form>
+            </div>#}
+            <a href="{{ url_for('item', item_id=item.item_id) }}" class= "btn btn-primary">view item</a>
+        </div>
+    {% endfor %}
+</div>
+
+{% include "footer.html" %}
+{# 
+
+{'auction_end': 'Thu, 18 Nov 2021 00:09:00 GMT',
+ 'auction_id': 5,
+  'auction_start': 'Wed, 17 Nov 2021 00:09:00 GMT',
+   'auction_status': 'notst',
+    'auction_type': 'FB', 'item_id': '99', 'user_id': 88, 'winning_bid': None} #}

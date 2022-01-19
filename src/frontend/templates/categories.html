@@ -1,0 +1,28 @@
+{% include "header.html"%}
+<table>
+    <tr>
+        <th>category name</th>
+        <th>edit/delete</th>
+    </tr>
+    {% for category in category_ls%}
+    <tr>
+    <td>{{category.name}}</td>
+        <td>
+            <a href="editcategory/{{category.id}}">edit</a>
+            <a href="deletecategory/{{category.id}}">delete</a>
+        </td>
+    </tr>
+</table>
+    {% endfor %}}
+    <p>Note that deletion will remove the category from all items</p>
+    <h2>Add New Category</h2>
+    <form>
+        <label for="new-category">New Category Name</label>
+        <input name="new-category">
+        <button type="submit" class="btn btn-success">Create New category</button>
+    </form>
+    <div class="alert alert-danger" role="alert" style="display: none;">
+        We were not able top process your request at the backend. And so we remained on this page.
+    </div>
+{% include "footer.html"%}
+

@@ -1,0 +1,54 @@
+{% include "header.html" %}
+<div id ="create-new-item-cont">
+    <form action="/create-item">
+        <input type="submit" value="add new item" />
+    </form>
+</div>
+<div id="myitems-root-cont">
+    {% for item in item_ls %}
+        <div id="item-card-{{item.item_id}}" class="card ">
+            <div class="card-body">
+                <h5 class="card-title">name:{{ item.name }}</h5>
+                <p class="card-text">description:{{ item.description }}</p>
+                <p class="card-text">original price:{{ item.price }}</p>
+                {# <p class="card-text">{{ item.current_bid }}</p> #}
+                {% if item.auction_id %}
+                <p class="card-text">{{ item.auction_start}}</p>
+                <p class="card-text">{{ item.auction_end }}</p>
+                {% endif %}
+                {# <p class="card-text">{{ item.status }}</p> #}
+                <p class="card-text">{{ item.categories }}</p>
+                {% if item.sold %}
+                <p class="card-text">Sold Price:{{ item.sold }}</p>
+                {% endif %}
+                {% if item.status=="on" %}
+                <a href='/item/{{item.id}}' class="btn btn-primary">go to auction</a>
+                {% endif %}
+                {% if not item.auction_id %}
+                <div id="create-auction">
+                    <a href="{{ url_for('create_auction', item_id=item.item_id) }}" class="btn btn-primary">create auction</a>
+                </div>
+                {% endif %}
+                <div>
+                    {#<button id="delete-btn-{{item.item_id}}" onlclick="delete(this)" value="{{item.item_id}}">Delete</button>#}
+                    <a href="{{ url_for('delete_item', item_id=item.item_id) }}" class="btn btn-primary">Delete</a>
+                    {#<a id="delete-button" href='http://localhost:3309/delete_item/{{item.item_id}}' class="btn btn-primary">Delete</a>#}
+                    
+                </div>
+            </div>
+            <div>{{item}}</div>
+        </div>
+    {% endfor %}
+</div>
+
+{% include "footer.html" %}
+
+
+<!-- 
+
+mapping api's
+ -->
+
+ {# 
+ if item has no auction details, have  a create auction button for it.
+  #}

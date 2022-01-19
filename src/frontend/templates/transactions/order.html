@@ -1,0 +1,29 @@
+{% include "header.html"%}
+<h1>Complete order</h1>
+<h2>Make payment</h2>
+{% for item in order%}
+<div class="card">
+    <div class="row">
+    <h3 class="col-md">{{ item.name }}</h3>
+    <h3 class="col-sm">{{ item.price }}</h3>
+</div>
+{% endfor %}
+<h2>Total: {{total}}</h2>
+<div id="payment-cont">
+    Pay by:
+    <button>
+            <div class="col-md">
+                <div class="card-type">Debit card</div>
+                <div class="card-number">Card ending with 1234</div>
+            </div>
+            <div class="col-sm">
+            </div>
+    </button>
+
+    </div>
+
+<!--<button class="btn btn-primary">Make payment</button>-->
+
+<a id="complete-button" href='{{ url_for("order_complete",user_id=None) }}' class="btn btn-primary">'proceed with order'</a>
+<script src="{{url_for('static', filename='js/order.js')}}"></script>
+{% include "footer.html"%}
