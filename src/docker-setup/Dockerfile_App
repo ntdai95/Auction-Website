@@ -10,5 +10,3 @@ RUN apt-get install -y iputils-ping
 RUN apt-get install -y curl
 RUN pip3 install flask pika pymysql uuid requests Flask-JSGlue flask_cors pydantic bson pymongo flask_restful cryptography
 RUN git clone https://github.com/ntdai95/AuctionWebsite.git
-EXPOSE 3306
-EXPOSE 3307

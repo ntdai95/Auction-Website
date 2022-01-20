@@ -59,7 +59,7 @@ services:
       MYSQL_USER: REDACTED
       MYSQL_PASSWORD: REDACTED
       MYSQL_TCP_PORT: 3322
-  
+
   users:
     build: 
       context: ./
