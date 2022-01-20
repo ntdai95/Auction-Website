@@ -59,7 +59,7 @@ services:
       MYSQL_USER: user
       MYSQL_PASSWORD: user
       MYSQL_TCP_PORT: 3322
-  
+
   users:
     build: 
       context: ./
