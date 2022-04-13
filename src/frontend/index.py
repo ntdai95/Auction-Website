@@ -1,26 +1,10 @@
-from types import MethodDescriptorType
 from flask import Flask, render_template, request, jsonify,redirect, url_for
 import requests
-from functools import wraps
-# from flask_cors import CORS
-from datetime import datetime, timedelta
+from datetime import datetime
 from flask_jsglue import JSGlue
 import json
 from decimal import Decimal
 import sys
-
-import string
-import random
-# import mysql.connector # pip3 install mysql-connector
-# import bcrypt
-# import configparser
-import io
-import sys
-from requests.api import get
-
-from werkzeug.wrappers import ETagRequestMixin
-
-# from auctions.app import do_query
 
 app = Flask(__name__)
 jsglue = JSGlue(app)

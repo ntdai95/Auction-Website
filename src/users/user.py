@@ -1,4 +1,3 @@
-import requests
 from flask import Flask, request, jsonify
 from database import UserDB
 from models import User

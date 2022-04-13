@@ -1,5 +1,4 @@
-'''r
-
+'''
 Implements Item and Category classes to act as object layer atop crud.py.
 '''
 
