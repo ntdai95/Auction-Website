@@ -1,5 +1,5 @@
 import pymysql.cursors
-from transaction import cart, order
+from transaction import cart
 
 conn = pymysql.connect(
     host = "localhost",

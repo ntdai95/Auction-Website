@@ -1,15 +1,9 @@
-from typing_extensions import ParamSpecArgs
-from flask import Flask, json, jsonify, request, render_template
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 import requests
-# import psycopg2 as pg
-# import psycopg2.extras as pgextras
 import pymysql
 import crud
-#from message_rpc_client import MessageRpcClient
-
 import sys
-import uuid
 import datetime
 
 app = Flask(__name__)
@@ -23,20 +17,6 @@ port = 3328
 db = "auctions"
 auction_types_ls = ["first_bid", "second_bid", "buy_now"]
 auction_status = ["on", "complete", "notst", "closed"]
-
-# def get_pg_error(err):
-#     err_type, err_obj, traceback = sys.exc_info()
-#     line_num = traceback.tb_lineno
-#     print ("\npsycopg2 ERROR:", err, "on line number:", line_num)
-#     print ("psycopg2 traceback:", traceback, "-- type:", err_type)
-
-#     # psycopg2 extensions.Diagnostics object attribute
-#     print ("\nextensions.Diagnostics:", err.diag)
-
-#     # print the pgcode and pgerror exceptions
-#     print ("pgerror:", err.pgerror)
-#     print ("pgcode:", err.pgcode, "\n")
-
 
 def do_query(query, vars, res=None, fact=None):
     try:

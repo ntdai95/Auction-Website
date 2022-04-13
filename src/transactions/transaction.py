@@ -2,10 +2,7 @@ from os import error
 from datetime import datetime
 import pymysql.cursors
 import time
-from functools import reduce
 import sys
-#from mysql.connector import  MySQLIntegrityConstraintViolationException
-
 
 
 connection = pymysql.connect(
