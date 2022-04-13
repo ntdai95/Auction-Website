@@ -9,7 +9,7 @@ api = Api(app)
 parser = reqparse.RequestParser()
 parser.add_argument('list', type=list)
 
-@app.route("/item/test",methods=['GET','POST'])
+@app.route("/item/test", methods=['GET','POST'])
 def test():
     return jsonify("SUCCESS")
 
