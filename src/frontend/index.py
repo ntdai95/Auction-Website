@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, jsonify,redirect, url_for
 import requests
 from datetime import datetime
+from markupsafe import Markup
 from flask_jsglue import JSGlue
 import json
 from decimal import Decimal
