@@ -34,14 +34,14 @@ services:
       - 3307:3307
     links:
       - itemsdb
-    working_dir: /AuctionWebsite/src/items/core/
+    working_dir: /AuctionWebsite/src/items/
     command: "flask run"
     environment:
       FLASK_APP : restful_items.py
       FLASK_RUN_PORT: 3307
       FLASK_RUN_HOST: 0.0.0.0
       FLASK_ENV: development
-      WORKING_DIRECTORY: /AuctionWebsite/src/items/core/
+      WORKING_DIRECTORY: /AuctionWebsite/src/items/
   
   usersdb:
     build: 
