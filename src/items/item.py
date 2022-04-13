@@ -13,7 +13,7 @@ import time
 import crud
 import os
 import sys
-message_client_path = os.path.join(os.path.dirname(__file__), '../../messages')
+message_client_path = os.path.join(os.path.dirname(__file__), '../messages')
 sys.path.append(message_client_path)
 from message_rpc_client import MessageRpcClient
 
