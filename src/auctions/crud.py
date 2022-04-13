@@ -9,7 +9,6 @@ conn = pymysql.connect(host="auctionsdb",
                        db="auctions",
                        port=3328)
 
-
 def update(table, primary_key, key_value, column,
                  column_value):
     '''

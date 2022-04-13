@@ -138,7 +138,7 @@ def edit_item():
     item = Item.load(item_id)
     user_id = request.args.get('user_id',None)
 
-    res = item.batch_edit(properties,values)
+    res = item.batch_edit(properties, values)
     print(res,file=sys.stderr)
     #return jsonify({'error':""})
     return jsonify({'edited':item.item_id})

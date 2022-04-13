@@ -4,12 +4,6 @@ import sys
 
 app = Flask(__name__)
 
-@app.route("/")
-def helloworld():
-    #return jsonify("Hello world")
-    return '<h1>Hello World</h1>'
-
-
 @app.route("/cart")
 @app.route("/cart/getCart_by_user", methods=['GET'])
 def getCart_by_user():
@@ -26,7 +20,6 @@ def getCart_by_user():
         print(items[1])
         return (jsonify(items[1]))
     return jsonify("Bad Request")
-
 
 
 @app.route("/cart")
