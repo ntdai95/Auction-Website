@@ -1,4 +1,3 @@
-# syntax=docker/dockerfile:1
 FROM ubuntu:latest
 RUN apt-get update 
 RUN apt-get install -y git 
@@ -8,5 +7,5 @@ RUN apt-get install -y net-tools
 RUN apt-get install -y vim neovim
 RUN apt-get install -y iputils-ping
 RUN apt-get install -y curl
-RUN pip3 install flask pika pymysql uuid requests Flask-JSGlue flask_cors pydantic bson pymongo flask_restful cryptography
+RUN pip3 install flask pika pymysql uuid requests Flask-JSGlue pydantic bson pymongo flask_restful cryptography
 RUN git clone https://github.com/ntdai95/AuctionWebsite.git

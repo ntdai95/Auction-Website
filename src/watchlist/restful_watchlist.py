@@ -1,7 +1,6 @@
 import crud
-from dataclasses import dataclass
 import datetime
-from flask import Flask, jsonify, request
+from flask import Flask, request
 import os
 import sys
 message_client_path = os.path.join(os.path.dirname(__file__), '../messages')

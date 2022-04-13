@@ -3,9 +3,6 @@ from flask_restful import Api, reqparse
 from item import Item, Categories, COUNTERFEIT_THRESHOLD
 import os
 import sys
-message_client_path = os.path.join(os.path.dirname(__file__), '../../messages')
-sys.path.append(message_client_path)
-from message_rpc_client import MessageRpcClient
 
 app = Flask(__name__)
 api = Api(app)

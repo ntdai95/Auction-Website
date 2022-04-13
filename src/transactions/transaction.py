@@ -1,6 +1,5 @@
-from os import error, path
+from os import error
 from datetime import datetime
-from flask import Flask, request, jsonify, render_template
 import pymysql.cursors
 import time
 from functools import reduce
