@@ -233,8 +233,6 @@ services:
       - netBackEnd
     ports: 
       - 3314:3314
-    volumes:
-      - ./init:/mountscript
     working_dir: /AuctionWebsite/src/messages/
     environment:
       WORKING_DIRECTORY: /AuctionWebsite/src/messages/ 
