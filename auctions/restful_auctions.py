@@ -6,6 +6,7 @@ import crud
 import sys
 import datetime
 
+
 app = Flask(__name__)
 CORS(app)
 
@@ -17,6 +18,7 @@ port = 3328
 db = "auctions"
 auction_types_ls = ["first_bid", "second_bid", "buy_now"]
 auction_status = ["on", "complete", "notst", "closed"]
+
 
 def do_query(query, vars, res=None, fact=None):
     try:

@@ -3,7 +3,9 @@ import uuid
 import json
 import requests
 
+
 USERS = "http://users:3312"
+
 
 class MessageRpcClient(object):
     def __init__(self):

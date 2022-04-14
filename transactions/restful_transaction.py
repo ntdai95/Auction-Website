@@ -1,8 +1,9 @@
 from flask import Flask, jsonify, request
 from transaction import cart
-import sys
+
 
 app = Flask(__name__)
+
 
 @app.route("/cart")
 @app.route("/cart/getCart_by_user", methods=['GET'])

@@ -34,14 +34,14 @@ services:
       - 3307:3307
     links:
       - itemsdb
-    working_dir: /AuctionWebsite/src/items/
+    working_dir: /AuctionWebsite/items/
     command: "flask run"
     environment:
       FLASK_APP : restful_items.py
       FLASK_RUN_PORT: 3307
       FLASK_RUN_HOST: 0.0.0.0
       FLASK_ENV: development
-      WORKING_DIRECTORY: /AuctionWebsite/src/items/
+      WORKING_DIRECTORY: /AuctionWebsite/items/
   
   usersdb:
     build: 
@@ -71,13 +71,13 @@ services:
       - 3312:3312
     links:
       - usersdb
-    working_dir: /AuctionWebsite/src/users/
+    working_dir: /AuctionWebsite/users/
     command: "flask run"
     environment:
       FLASK_APP : user.py
       FLASK_RUN_PORT: 3312
       FLASK_RUN_HOST: 0.0.0.0
-      WORKING_DIRECTORY: /AuctionWebsite/src/users/
+      WORKING_DIRECTORY: /AuctionWebsite/users/
 
   auctionsdb:
     build: 
@@ -107,14 +107,14 @@ services:
       - 3318:3318
     links:
       - auctionsdb
-    working_dir: /AuctionWebsite/src/auctions/
+    working_dir: /AuctionWebsite/auctions/
     command: "flask run"
     environment:
       FLASK_APP : restful_auctions.py
       FLASK_RUN_PORT: 3318
       FLASK_RUN_HOST: 0.0.0.0
       FLASK_ENV: development
-      WORKING_DIRECTORY: /AuctionWebsite/src/auctions/
+      WORKING_DIRECTORY: /AuctionWebsite/auctions/
   
   transactionsdb:
     build: 
@@ -144,13 +144,13 @@ services:
       - 3305:3305
     links:
       - transactionsdb
-    working_dir: /AuctionWebsite/src/transactions/
+    working_dir: /AuctionWebsite/transactions/
     command: "flask run"
     environment:
       FLASK_APP : restful_transaction.py
       FLASK_RUN_PORT: 3305
       FLASK_RUN_HOST: 0.0.0.0
-      WORKING_DIRECTORY: /AuctionWebsite/src/transactions/
+      WORKING_DIRECTORY: /AuctionWebsite/transactions/
   
   watchlistdb:
     build: 
@@ -180,13 +180,13 @@ services:
       - 3311:3311
     links:
       - watchlistdb
-    working_dir: /AuctionWebsite/src/watchlist/
+    working_dir: /AuctionWebsite/watchlist/
     command: "flask run"
     environment:
       FLASK_APP : restful_watchlist.py
       FLASK_RUN_PORT: 3311
       FLASK_RUN_HOST: 0.0.0.0
-      WORKING_DIRECTORY: /AuctionWebsite/src/watchlist/
+      WORKING_DIRECTORY: /AuctionWebsite/watchlist/
 
   frontend:
     build: 
@@ -197,14 +197,14 @@ services:
       - netBackEnd
     ports:
       - 3309:3309
-    working_dir: /AuctionWebsite/src/frontend/
+    working_dir: /AuctionWebsite/frontend/
     command: "flask run"
     environment:
       FLASK_APP : index.py
       FLASK_RUN_PORT: 3309
       FLASK_RUN_HOST: 0.0.0.0
       FLASK_ENV: development
-      WORKING_DIRECTORY: /AuctionWebsite/src/frontend/
+      WORKING_DIRECTORY: /AuctionWebsite/frontend/
   
   messagesmongo:
     build:
@@ -218,11 +218,11 @@ services:
     volumes:
       - ./init:/mountscript
     command: ["--bind_ip_all"]
-    working_dir: /AuctionWebsite/src/messages/
+    working_dir: /AuctionWebsite/messages/
     environment:
       MONGO_INITDB_ROOT_USERNAME: messagesMongo
       MONGO_INITDB_ROOT_PASSWORD: messagesMongo
-      WORKING_DIRECTORY: /AuctionWebsite/src/messages/
+      WORKING_DIRECTORY: /AuctionWebsite/messages/
 
   messagesrabbitmq:
     build:
@@ -233,6 +233,6 @@ services:
       - netBackEnd
     ports: 
       - 3314:3314
-    working_dir: /AuctionWebsite/src/messages/
+    working_dir: /AuctionWebsite/messages/
     environment:
-      WORKING_DIRECTORY: /AuctionWebsite/src/messages/ 
+      WORKING_DIRECTORY: /AuctionWebsite/messages/ 

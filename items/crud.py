@@ -1,7 +1,7 @@
 import datetime
 import time
 import pymysql.cursors
-import sys
+
 
 conn = pymysql.connect(host="itemsdb",
                        user="items",

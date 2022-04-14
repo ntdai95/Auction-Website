@@ -1,10 +1,12 @@
 import requests
 import datetime
 
+
 auctions_conf = {
     "host": "auctions",
     "port": 3308
 }
+
 
 auctions_conf["host"]
 while True:

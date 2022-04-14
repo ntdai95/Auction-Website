@@ -1,13 +1,14 @@
 import datetime
 import time
 import pymysql.cursors
-import sys
+
 
 conn = pymysql.connect(host="auctionsdb",
                        user="auctions",
                        password="auctions",
                        db="auctions",
                        port=3328)
+
 
 def update(table, primary_key, key_value, column, column_value):
     '''
