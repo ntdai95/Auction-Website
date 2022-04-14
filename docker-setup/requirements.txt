@@ -1,12 +1,13 @@
-flask
+Jinja2>=2.10.1,<3.1
+Flask
 pika
-pymysql
+PyMySQL
 uuid
 requests
 Flask-JSGlue
-flask_cors
+Flask_Cors
 pydantic
 bson
 pymongo
-flask_restful
+Flask_RESTful
 cryptography
