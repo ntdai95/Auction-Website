@@ -8,7 +8,7 @@ PWD = "messagesMongo"
 
 class MessageDB:
     def __init__(self) -> None:
-        self.connection = pymongo.MongoClient(f'mongodb://{USR}:{PWD}@messagesMongo:27017') #3313
+        self.connection = pymongo.MongoClient(f'mongodb://{USR}:{PWD}@messagesMongo:27017')
         self.db = self.connection['message_db']
         self.create_collections()
         self.message_collection = self.db.get_collection("message")
