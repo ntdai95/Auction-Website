@@ -6,5 +6,5 @@ RUN apt-get install -y python3-pip
 RUN apt-get install -y net-tools
 RUN apt-get install -y vim
 RUN apt-get install -y iputils-ping
-RUN pip3 install jinja2<3.1 flask pika pymysql uuid requests Flask-JSGlue flask_cors pydantic flask_restful cryptography
+RUN pip3 install flask pika pymysql uuid requests Flask-JSGlue flask_cors pydantic flask_restful cryptography
 RUN git clone https://github.com/ntdai95/AuctionWebsite.git
