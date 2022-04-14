@@ -215,8 +215,6 @@ services:
       - netBackEnd
     ports: 
       - 3313:3313
-    volumes:
-      - ./init:/mountscript
     command: ["--bind_ip_all"]
     working_dir: /AuctionWebsite/messages/
     environment:
