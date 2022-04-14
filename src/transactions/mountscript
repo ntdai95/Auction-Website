@@ -1,2 +1,0 @@
-cd $WORKING_DIRECTORY
-flask run

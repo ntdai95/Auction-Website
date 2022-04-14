@@ -1,1 +1,0 @@
-Basic blueprint of api endpoints and structure of the user dataclass
