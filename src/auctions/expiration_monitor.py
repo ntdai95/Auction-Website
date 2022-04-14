@@ -1,5 +1,4 @@
 import requests
-import time
 import datetime
 #view auctions every minute
 #if auction finished send to cart
