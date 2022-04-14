@@ -1,7 +1,6 @@
 from flask import Flask, jsonify, request
 from flask_restful import Api, reqparse
-from item import Item, Categories, COUNTERFEIT_THRESHOLD
-import sys
+from item import Item, Categories
 import requests
 
 app = Flask(__name__)

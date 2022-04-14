@@ -1,13 +1,14 @@
 import datetime
 import time
 import pymysql.cursors
-import sys
 
-conn = pymysql.connect(host="auctionsdb",
+
+conn = pymysql.connect(host="itemsdb",
                        user="REDACTED",
                        password="REDACTED",
-                       db="auctions",
-                       port=3328)
+                       db="items",
+                       port=3317)
+
 
 def update(table, primary_key, key_value, column, column_value):
     '''
@@ -30,16 +31,14 @@ def update(table, primary_key, key_value, column, column_value):
     update = \
     f"""
     UPDATE {table}
-    SET 
-        {column} = {column_value}
-    WHERE 
-        {primary_key} = {key_value};
+    SET {column} = {column_value}
+    WHERE {primary_key} = {key_value};
     """
     cursor = conn.cursor()
     cursor.execute(update)
     conn.commit()
 
-def batch_update(table, primary_key, key_value, columns: list=[],column_values: list = []):
+def batch_update(table, primary_key, key_value, columns: list=[], column_values: list=[]):
     values = []
     for i in column_values:
         bls =  ["False", "True", False, True]
@@ -58,17 +57,16 @@ def batch_update(table, primary_key, key_value, columns: list=[],column_values: 
     for i, col in enumerate(columns):
         p = col + "=" + (values[i] or "NULL")
         paired += p + ","
-    paired = paired.strip(",")
-    
 
+    paired = paired.strip(",")
     if type(key_value) == str:
         key_value = "\"" + key_value + "\""
 
-    update = \
+    update= \
     f"""
     UPDATE {table} 
     SET {paired}
-    WHERE {primary_key} = {key_value};
+    WHERE {primary_key} ={key_value};
     """
     cursor = conn.cursor()
     cursor.execute(update)
@@ -99,10 +97,7 @@ def create(table, inputs):
     """
     cursor = conn.cursor()
     cursor.execute(insert)
-    id = cursor.lastrowid
     conn.commit()
-    return id
-
 
 def delete(from_table, primary_key, key_value):
     """
@@ -114,13 +109,13 @@ def delete(from_table, primary_key, key_value):
     delete = \
     f"""
     DELETE FROM {from_table}
-    WHERE {primary_key} = {key_value};
+    WHERE {primary_key}={key_value};
     """
     cursor = conn.cursor()
     cursor.execute(delete)
     conn.commit()
 
-def read(table, primary_key, key_value, columns: list = None):
+def read(table, primary_key, key_value, columns: list=None):
     """
         Inputs: table, primary_key, key_value, columns as list
     """
@@ -135,7 +130,8 @@ def read(table, primary_key, key_value, columns: list = None):
     f"""
     SELECT {cols or "*"}
     FROM {table}
-    WHERE {primary_key} = {key_value};
+    WHERE 
+        {primary_key} = {key_value}
     """
     cursor = conn.cursor()
     cursor.execute(get)
@@ -160,15 +156,13 @@ def search(table, primary_key, properties, search_values):
         else:
             s = f"{a} LIKE \'%{b}%\'"
 
-        if ">" in b or "<":
-            s = f"{a}{b}"
         search_keys.append(s)
 
     search = \
     f"""
     SELECT {primary_key}
     FROM {table}
-    WHERE {" AND ".join(search_keys)};
+    WHERE {" AND ".join(search_keys)} AND sold = 0;
     """
     cursor = conn.cursor()
     cursor.execute(search)
