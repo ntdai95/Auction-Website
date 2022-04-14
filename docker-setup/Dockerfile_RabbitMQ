@@ -7,5 +7,5 @@ RUN apt-get install -y net-tools
 RUN apt-get install -y openssh-client
 RUN apt-get install -y vim
 RUN apt-get install -y iputils-ping
-RUN pip3 install flask pika uuid requests flask_cors pydantic bson pymongo flask_restTful cryptography
+RUN pip3 install flask pika uuid requests flask_cors pydantic bson pymongo flask_restful cryptography
 RUN git clone https://github.com/ntdai95/AuctionWebsite.git
