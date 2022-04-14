@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify,redirect, url_for
+from flask import Flask, render_template, request, jsonify, redirect, url_for
 import requests
 from datetime import datetime
 from flask_jsglue import JSGlue
