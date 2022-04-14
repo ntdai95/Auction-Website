@@ -1,12 +1,12 @@
 from flask import Flask, render_template, request, jsonify, redirect, url_for
 import requests
 from datetime import datetime
-from flask_jsglue import JSGlue
+# from flask_jsglue import JSGlue
 import json
 from decimal import Decimal
 
 app = Flask(__name__)
-jsglue = JSGlue(app)
+# jsglue = JSGlue(app)
 
 items_conf = {
     "host": "items",
