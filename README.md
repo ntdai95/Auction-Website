@@ -1,4 +1,4 @@
-How to run:
+How to run (may need to use "docker system prune -a" command first):
 
 1. cd setup
 2. ./runscript.sh
