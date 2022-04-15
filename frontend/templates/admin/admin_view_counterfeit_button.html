@@ -6,23 +6,21 @@
  #}
 
 {% for item in item_ls %}
-        <div id="item-card-{{item.item_id}}" class="card ">
-            <div class="card-body">
-                <h5 class="card-title">name:{{ item.name }}</h5>
-                <p class="card-text">description:{{ item.description }}</p>
-                <p class="card-text">{{ item.categories }}</p>
-                <form action="/admin/counterfeit" method="post">
-									<input type='hidden' name='item' value={{item.item_id}} type='submit'>
-									<button id="delete-item" name="del" type='submit' value={{item.item_id}}>Delete</button>
-									<button id="approve-item" name='app' type='submit' value={{item.item_id}}>Not Fake</button>
-								</form>
-            </div>
-            <div>{{item}}</div>
-        </div>
+<div id="item-card-{{item.item_id}}" class="card ">
+    <div class="card-body">
+        <h5 class="card-title">name:{{ item.name }}</h5>
+        <p class="card-text">description:{{ item.description }}</p>
+        <p class="card-text">{{ item.categories }}</p>
+        <form action="/admin/counterfeit" method="post">
+            <input type='hidden' name='item' value={{item.item_id}} type='submit'>
+            <button id="delete-item" name="del" type='submit' value={{item.item_id}}>Delete</button>
+            <button id="approve-item" name='app' type='submit' value={{item.item_id}}>Not Fake</button>
+        </form>
+    </div>
+    <div>{{item}}</div>
+</div>
 {% endfor %}
 
-		{# <script src="{{url_for('static', filename='js/auction.js')}}"></script> #}
-
-
+<script src="{{url_for('static', filename='js/auction.js')}}"></script>
 
 {% include "admin_footer.html" %}

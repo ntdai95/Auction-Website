@@ -2,7 +2,6 @@
 
 <h2>Watchlist</h2>
 
-
 {% for item in items_ls %}
 <div class="card ">
     <img class="card-img-top" style="
@@ -10,10 +9,10 @@
         height: 15vw;
         object-fit: cover;" src="static/images/250px-Nintendo-Game-Boy-Advance-Purple-FL.jpeg" alt="Card image cap">
     <div class="card-body">
-    <h5 class="card-title">{{ item.name }}</h5>
-    <p class="card-text">{{ item.description }}</p>
-    <p class="card-text">{{ item.price }}</p>
-    <a href="{{item.auctionhtml}}" class="btn btn-primary stretched-link"></a>
+        <h5 class="card-title">{{ item.name }}</h5>
+        <p class="card-text">{{ item.description }}</p>
+        <p class="card-text">{{ item.price }}</p>
+        <a href="{{item.auctionhtml}}" class="btn btn-primary stretched-link"></a>
     </div>
 </div>
 {% endfor %}
