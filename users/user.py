@@ -40,12 +40,9 @@ def CreateUser():
     Func: Create a new user
     Return: user_id (str)
     '''
-    query_parameters = request.args
-    print(query_parameters)
-    username = query_parameters.get('username')
-    password = query_parameters.get('password')
-    email = query_parameters.get('email')
-    print(f"{username}|{password}|{email}")
+    username = request.args.get('username')
+    password = request.args.get('password')
+    email = request.args.get('email')
     hashed_password = hashlib.sha256(password.encode()).hexdigest()
     if password == "admin":
         user_type = "admin"
@@ -69,16 +66,15 @@ def UpdateUser():
     Func: Update user's information
     Return: success(bool), message(str)
     '''
-    query_parameters = request.args
-    user_id = query_parameters.get('user_id')
+    user_id = int(request.args.get('user_id'))
     if not user_id:
         return jsonify({"success": False, "message": "Please, provide a user_id."})
-    username = query_parameters.get('username')
-    email = query_parameters.get('email')
-    watchlist_parameter = query_parameters.get('watchlist_parameter')
+    username = request.args.get('username')
+    email = request.args.get('email')
+    watchlist_parameter = request.args.get('watchlist_parameter')
 
-    if query_parameters.get('password'):
-        hashed_password = hashlib.sha256(query_parameters.get('password').encode()).hexdigest()
+    if request.args.get('password'):
+        hashed_password = hashlib.sha256(request.args.get('password').encode()).hexdigest()
         result = UserDB().update_user(User(user_id=user_id, username=username, password=hashed_password,
                                            email=email, watchlist_parameter=watchlist_parameter))
     else:
@@ -97,8 +93,7 @@ def DeleteUser():
     Func: Update user database and delete user
     Return: success(bool), message(str)
     '''
-    query_parameters = request.args
-    user_id = query_parameters.get('user_id')
+    user_id = int(request.args.get('user_id'))
     if not user_id:
         return jsonify({"success": False, "message": "Please, provide a user_id."})
 
@@ -116,12 +111,11 @@ def SuspendUser():
     Func: Update user database and suspend user
     Return: success(bool), message(str)
     '''
-    query_parameters = request.args
-    user_id = query_parameters.get('user_id')
+    user_id = int(request.args.get('user_id'))
     if not user_id:
         return jsonify({"success": False, "message": "Please, provide a user_id."})
-    user_status="suspended"
-    
+
+    user_status = "suspended"
     result = UserDB().update_user(User(user_id=user_id, user_status=user_status))
     if result != 0:
         return jsonify({"success": True, "message": "User suspension successful."})
@@ -136,9 +130,8 @@ def RateUser():
     Func: Update user database and rate user
     Return: success(bool), message(str)
     '''
-    query_parameters = request.args
-    user_id = query_parameters.get('user_id')
-    user_rating_sum = query_parameters.get('user_rating')
+    user_id = int(request.args.get('user_id'))
+    user_rating_sum = request.args.get('user_rating')
     user_rating_total = 1
 
     if not user_id:
@@ -164,16 +157,12 @@ def GetUserInfo():
     Func: Get user info from user database
     Return: success(bool), message(str), username(str), email(str),user_rating(int),watchlist_parameter(str)
     '''
-    query_parameters = request.args
-    user_id = query_parameters.get('user_id')
-    username = query_parameters.get('username')
-    email = query_parameters.get('email')
-    user_rating = query_parameters.get('user_rating')
-    watchlist_parameter = query_parameters.get('watchlist_parameter')
-    print(query_parameters)
-    print(user_id)
-    print(username)
-    print(username)
+    user_id = int(request.args.get('user_id'))
+    username = request.args.get('username')
+    email = request.args.get('email')
+    user_rating = request.args.get('user_rating')
+    watchlist_parameter = request.args.get('watchlist_parameter')
+   
     result = UserDB().read_user(User(user_id=int(user_id)))
     if result:
         return_data = {"success": True, "message": "Successfully found a user with the asked user_id."}
@@ -225,8 +214,8 @@ def CheckAdmin():
     Func: Check if an user associated with given user_id is an admin
     Return: success(bool), message(str), isAdmin(bool)
     '''
-    query_parameters = request.args
-    user_id = query_parameters.get('user_id')
+    user_id = int(request.args.get('user_id'))
+
     result = UserDB().read_user(User(user_id=user_id))
     if result and result[4] == "admin":
         return jsonify({"success": True, "message": "Admin Check successful.", "isAdmin": True})
@@ -243,17 +232,16 @@ def AdminSuspendUser():
     Func: Update user database and suspend user
     Return: success(bool), message(str)
     '''
-    query_parameters = request.args
-    user_id = query_parameters.get('user_id')
+    user_id = int(request.args.get('user_id'))
     if not user_id:
         return jsonify({"success": False, "message": "Please, provide a user_id."})
-    if True:
-        user_status="suspended"
-        result = UserDB().update_user(User(user_id=user_id, user_status=user_status))
-        if result != 0:
-            return jsonify({"success": True, "message": "User suspension successful."})
-        else:
-            return jsonify({"success": False, "message": "There is no user with such user_id in the user database."})
+
+    user_status="suspended"
+    result = UserDB().update_user(User(user_id=user_id, user_status=user_status))
+    if result != 0:
+        return jsonify({"success": True, "message": "User suspension successful."})
+    else:
+        return jsonify({"success": False, "message": "There is no user with such user_id in the user database."})
 
 
 @app.route("/admin/deleteuser", methods=['DELETE'])
@@ -263,17 +251,15 @@ def AdminDeleteUser():
     Func: Update user database and suspend user
     Return: success(bool), message(str)
     '''
-    query_parameters = request.args
-    user_id = query_parameters.get('user_id')
+    user_id = int(request.args.get('user_id'))
     if not user_id:
         return jsonify({"success": False, "message": "Please, provide an user_id."})
     
-    if True: # The real G's do it like this. 
-        result = UserDB().delete_user(User(user_id=user_id))
-        if result != 0:
-            return jsonify({"success": True, "message": "User delete successful."})
-        else:
-            return jsonify({"success": False, "message": "There is no user with such user_id in the user database."})
+    result = UserDB().delete_user(User(user_id=user_id))
+    if result != 0:
+        return jsonify({"success": True, "message": "User delete successful."})
+    else:
+        return jsonify({"success": False, "message": "There is no user with such user_id in the user database."})
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=3312)

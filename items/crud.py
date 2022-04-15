@@ -149,7 +149,8 @@ def search(table, primary_key, properties, search_values):
             values.append(str(i))
 
     search_keys = []
-    for a, b in zip(properties, values):
+    for i in zip(properties, values):
+        a, b = i
         if a == 'price':
             min, max = b
             s = f"{a} BETWEEN {min} AND {max}"
