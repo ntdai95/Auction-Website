@@ -126,32 +126,31 @@ auction_ls = [
 
 @app.route('/', methods=["GET","POST"])
 def index():
-    if request.method=="GET":
+    if request.method == "GET":
         return render_template('index.html')
-    elif request.method=="POST":
-        username = request.form.get('username',None)
-        password = request.form.get('password',None)
-        data = {'username':username,'password':password}
+    elif request.method == "POST":
+        username = request.form.get('username', None)
+        password = request.form.get('password', None)
+        data = {'username':username,'password': password}
 
-        res = requests.get(f'http://{users_conf["host"]}:{users_conf["port"]}/user/login',params=data)
-        res=res.json()
-        if res is None:
+        res = requests.get(f'http://{users_conf["host"]}:{users_conf["port"]}/user/login', params=data).json()
+        if not res:
             return redirect("/")
 
         if res["success"]:
-            user_id=res["user_id"]
-            isadmin = requests.get(f'http://{users_conf["host"]}:{users_conf["port"]}/admin/checkadmin',params={"user_id":user_id})
+            user_id = res["user_id"]
+            isadmin = requests.get(f'http://{users_conf["host"]}:{users_conf["port"]}/admin/checkadmin', params={"user_id": user_id})
             isadmin = isadmin.json()["isAdmin"]
             isadmin = bool(isadmin)
             if isadmin:
-                return redirect(url_for("admin_main", username=username,user_id=res["user_id"], admin=isadmin))
+                return redirect(url_for("admin_main", username=username, user_id=res["user_id"], admin=isadmin))
             else:
-                return redirect(url_for("login_redirect", username=username,user_id=res["user_id"], admin=isadmin))
+                return redirect(url_for("login_redirect", username=username, user_id=res["user_id"], admin=isadmin))
         else:
             return redirect('/')
 
 @app.route('/login_redirect/<username>/<user_id>/<admin>', methods=["GET","POST"])
-def login_redirect(username,user_id,admin):
+def login_redirect(username, user_id, admin):
     return render_template("users/loggedin.html", username=username, user_id=user_id, admin=admin)
 
 @app.route('/logout', methods=["GET","POST"])
@@ -160,17 +159,17 @@ def logout():
 
 @app.route('/sign-up', methods=["GET","POST"])
 def sign_up():
-    if request.method=="GET":
-        return render_template("users/sign-up.html",error=False)
-    elif request.method=="POST":
-        username = request.form.get('username',None)
-        password = request.form.get('password',None)
-        email = request.form.get('email',None)
-        data = {'username':username,'password':password,'email':email}
+    if request.method == "GET":
+        return render_template("users/sign-up.html", error=False)
+    elif request.method == "POST":
+        username = request.form.get('username', None)
+        password = request.form.get('password', None)
+        email = request.form.get('email', None)
+        data = {'username':username,'password': password, 'email': email}
 
         try:
-            res = requests.post(f'http://{users_conf["host"]}:{users_conf["port"]}/user/create',params=data)
-            if res.json()['user_id']:
+            res = requests.post(f'http://{users_conf["host"]}:{users_conf["port"]}/user/create', params=data).json()
+            if res['user_id']:
                 return redirect("/")
             else:
                 return render_template("users/sign-up.html", error=True)
@@ -189,20 +188,20 @@ def my_items(user_id):
     values = [user_id]
     p = json.dumps({'params': params, 'values': values})
     p = {'user_id': user_id}
-    res = requests.get(f"http://{items_conf['host']}:{items_conf['port']}/items/allitems",params=p)
-    if res==None:
+    res = requests.get(f"http://{items_conf['host']}:{items_conf['port']}/items/allitems", params=p)
+    if not res:
         return render_template("items/myitems.html", item_ls=[])
 
     items = res.json()['items']
-    item_id_ls=[i["item_id"] for i in items]
-    auction_res = requests.post(f"http://{auctions_conf['host']}:{auctions_conf['port']}/list-auctions-by-id",json={"item_id_ls":item_id_ls})
+    item_id_ls = [i["item_id"] for i in items]
+    auction_res = requests.post(f"http://{auctions_conf['host']}:{auctions_conf['port']}/list-auctions-by-id", json={"item_id_ls": item_id_ls})
     if not auction_res:
         return render_template("items/myitems.html", item_ls=items)
     else:
         auction_res = auction_res.json()
         for item in items:
             if item["item_id"] in auction_res:
-                item["auction_id"]=auction_res[item["item_id"]]
+                item["auction_id"] = auction_res[item["item_id"]]
 
     return render_template("items/myitems.html", item_ls=items)
 
@@ -210,7 +209,7 @@ def my_items(user_id):
 def create_item():
     if request.method == "GET":
         return render_template("items/createitem.html")
-    elif request.method=="POST":
+    elif request.method == "POST":
         data = request.form
         some_d ={
             "properties":[],
@@ -221,8 +220,7 @@ def create_item():
             some_d["properties"].append(prop)
             some_d["values"].append(val)
 
-        res = requests.post(f"http://{items_conf['host']}:{items_conf['port']}/item/create",params=some_d)
-        res=res.json()
+        res = requests.post(f"http://{items_conf['host']}:{items_conf['port']}/item/create", params=some_d).json()
         if res["created"]:
             return redirect(url_for('my_items', user_id=data["user_id"]))
         else:
@@ -236,13 +234,12 @@ def item(item_id):
     # res = requests.get(f'http://{auctions_conf["host"]}:{auctions_conf["port"]}/view-auction-by-id/{item_id}')
     #Check if there is an auction for the item
     #if not create an auction page button for it
-    return render_template("items/item.html",item=item)
+    return render_template("items/item.html", item=item)
 
-@app.route("/delete-item", defaults={"item_id":None} ,methods=["GET","POST"])
+@app.route("/delete-item", defaults={"item_id": None} ,methods=["GET","POST"])
 @app.route('/delete-item/<item_id>')
 def delete_item(item_id):
-    res = requests.delete(f'http://{items_conf["host"]}:{items_conf["port"]}/item/delete', params={'item_id':item_id})
-    print(res.json())
+    requests.delete(f'http://{items_conf["host"]}:{items_conf["port"]}/item/delete', params={'item_id':item_id})
     return "Deleted!"
 
 
@@ -251,8 +248,8 @@ def delete_item(item_id):
 ###################################
 
 
-@app.route("/create-auction", defaults={"item_id":None} ,methods=["GET","POST"])
-@app.route("/create-auction/<item_id>",methods=["GET","POST"])
+@app.route("/create-auction", defaults={"item_id": None}, methods=["GET","POST"])
+@app.route("/create-auction/<item_id>", methods=["GET","POST"])
 def create_auction(item_id):
     if item_id:
         item_dict={
@@ -267,7 +264,7 @@ def create_auction(item_id):
             "item_id": 1
         }
 
-    if request.method=="POST":
+    if request.method == "POST":
         data = request.form.to_dict()
         res = requests.post(f'http://{auctions_conf["host"]}:{auctions_conf["port"]}/create-new-auction', json=data)     
         if not res:
