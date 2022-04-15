@@ -189,14 +189,12 @@ def my_items(user_id):
     p = json.dumps({'params': params, 'values': values})
     p = {'user_id': user_id}
     res = requests.get(f"http://{items_conf['host']}:{items_conf['port']}/items/allitems", params=p)
-    print(res)
     if not res:
         return render_template("items/myitems.html", item_ls=[])
 
     items = res.json()['items']
     item_id_ls = [i["item_id"] for i in items]
     auction_res = requests.post(f"http://{auctions_conf['host']}:{auctions_conf['port']}/list-auctions-by-id", json={"item_id_ls": item_id_ls})
-    print(auction_res)
     if not auction_res:
         return render_template("items/myitems.html", item_ls=items)
     else:
