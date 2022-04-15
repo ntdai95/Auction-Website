@@ -4,54 +4,53 @@
       {{ JSGlue.include() }}
 </header>
 <html>
-    <div id="navbar-cont">
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <a class="navbar-brand" href="#">Auctioneer</a>
-            <a id="user-disp" class="navbar-brand" href="#">lol</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-              <span class="navbar-toggler-icon"></span>
-            </button>
-          
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-              <ul class="navbar-nav mr-auto">
-                <li class="nav-item active">
-                  <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
-                </li>
-                <li class="nav-item">
-                  <a id="my-items-link" class="nav-link" >My Items</a>
-                </li>
-                <li class="nav-item">
-                  <a id="my-auctions-link" class="nav-link">My Auctions</a>
-                </li>
-                <li class="nav-item">
-                  <a id="active-auctions-link"class="nav-link" >Active Auctions</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="{{ url_for('search')}}">Search</a>
-                </li>
-                <li class="nav-item">
-                  <a id="cart-link" class="nav-link">Cart</a>
-                </li>
-                <li class="nav-item">
-                  <a id="settings-link" class="nav-link">Settings</a>
-                </li>
-                <li class="nav-item">
-                  <a id="watchlist-link" class="nav-link">watchlist</a>
-                </li>
-                <li class="nav-item">
-                  <a id="admin-link" class="nav-link" style="display: hidden;">admin</a>
-                </li>
-                <li class="nav-item">
-                  <a id="logout-link" class="nav-link">Logout</a>
-                </li>
-              </ul>
-              <form class="form-inline my-2 my-lg-0">
-                <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-              </form>
-            </div>
-          </nav>
-    </div>
-    <div id="root-cont" style="width: 80%; margin: auto;">
+  <div id="navbar-cont">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a class="navbar-brand" href="#">Auctioneer</a>
+      <a id="user-disp" class="navbar-brand" href="#">lol</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item">
+            <a id="my-items-link" class="nav-link" >My Items</a>
+          </li>
+          <li class="nav-item">
+            <a id="my-auctions-link" class="nav-link">My Auctions</a>
+          </li>
+          <li class="nav-item">
+            <a id="active-auctions-link"class="nav-link" >Active Auctions</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('search')}}">Search</a>
+          </li>
+          <li class="nav-item">
+            <a id="cart-link" class="nav-link">Cart</a>
+          </li>
+          <li class="nav-item">
+            <a id="settings-link" class="nav-link">Settings</a>
+          </li>
+          <li class="nav-item">
+            <a id="watchlist-link" class="nav-link">watchlist</a>
+          </li>
+          <li class="nav-item">
+            <a id="admin-link" class="nav-link" style="display: hidden;">admin</a>
+          </li>
+          <li class="nav-item">
+            <a id="logout-link" class="nav-link">Logout</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+  </div>
+
+  <div id="root-cont" style="width: 80%; margin: auto;">
     {# script needs to be below nabar elements for user-disp to be displayed #}
     <script src="{{ url_for('static', filename='js/header.js')}}"></script> 
+  </div>
+</html>
