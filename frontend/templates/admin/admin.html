@@ -2,26 +2,25 @@
 
 <div class="card" style="width: 18rem;">
 	<div class="card-body">
-    <h5 class="card-title">Inapropriate</h5>
+		<h5 class="card-title">Inapropriate</h5>
 		<a href="{{url_for('inapp')}}" class="btn btn-primary" text="view">view items</a>
 	</div>
 
-		<div class="card-body">
-
+	<div class="card-body">
 		<h5 class="card-title">Counterfeits</h5>
 		<a href="{{url_for('counter')}}" class="btn btn-primary" text="view">view items</a>
 	</div>
 
-		<div class="card-body">
-				<h5 class="card-title">Delete User</h5>
+	<div class="card-body">
+		<h5 class="card-title">Delete User</h5>
         <form action="/admin" method="POST">
             <label for="user_id">user_id</label>
             <input type="text" id='delete_user_id' name="delete_user_id">
             <input type="submit" value="delete user">
         </form>
 	</div>
-					
-		<div class="card-body">
+
+	<div class="card-body">
 		<h5 class="card-title">Suspend User</h5>
         <form action="/admin" method="POST">
             <label for="user_id">user_id</label>
@@ -29,34 +28,34 @@
             <input type="submit" value="suspend user">
         </form>
 	</div>
+
 	<div class="card-body">
 		<h5 class="card-title">Categories</h5>
         <form action="/admin" method="POST">
             <label for="current categories">current categories</label>
-						<select name="category1" method="GET" action="/admin">
-							{% for cat in categories %}
-								<option value= "{{cat}}" SELECTED>{{cat}}</option>"
-							{% endfor %}
-						</select>
+			<select name="category1" method="GET" action="/admin">
+				{% for cat in categories %}
+				<option value= "{{cat}}" SELECTED>{{cat}}</option>"
+				{% endfor %}
+			</select>
             <input type="text" id='categories' name="category2" placeholder="type to add category">
             <label for="user_id">blacklisted</label>
-						<input type="checkbox" checked="true" id='blacklisted' name="blacklisted">
-						<input type="submit" value="add" name='add'>
-						<input type="submit" value="delete" name='delete'>
-						<input type="submit" value="edit" name='edit'>
+			<input type="checkbox" checked="true" id='blacklisted' name="blacklisted">
+			<input type="submit" value="add" name='add'>
+			<input type="submit" value="delete" name='delete'>
+			<input type="submit" value="edit" name='edit'>
         </form>
 	</div>
 
 	<div class="card-body">
 		<h5 class="card-title">See All Auctions in Sorted Order</h5>
         <form action="/admin" method="POST">
-						<input type="submit" value="edit" name='see_auctions'>
+			<input type="submit" value="edit" name='see_auctions'>
         </form>
-				{% if auctions %}
-				<h6> No current auctions to see. </h6>
-				{% endif%}
+		{% if auctions %}
+		<h6> No current auctions to see. </h6>
+		{% endif%}
 	</div>
-
 </div>
 <script src="{{url_for('static', filename='js/auction.js')}}"></script>
 

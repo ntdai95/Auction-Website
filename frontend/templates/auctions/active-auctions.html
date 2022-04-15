@@ -2,34 +2,34 @@
 
 <div id="myitems-root-cont">
     {% for item in auction_ls %}
-        <div class="card ">
-            <div class="card-body">
-            <h5 class="card-title">{{ item.name }}</h5>
-            <h5 class="card-title">auction id:{{ item.auction_id }}</h5>
-            <p class="card-text">{{ item.auction_type }}</p>
-            <p class="card-text">{{ item.description }}</p>
-            <p class="card-text">{{ item.price }}</p>
-            <p class="card-text">{{ item.current_bid }}</p>
-            <p class="card-text">auction start:{{ item.auction_start }}</p>
-            <p class="card-text">auction end:{{ item.auction_end }}</p>
-            <p class="card-text">{{ item.status }}</p>
-            {% if item.auction_status=="on" %}
-            <a href="{{url_for('view_auction',auction_id=item.auction_id)}}" class="btn btn-primary">go to auction</a>
-            {% endif %}
-            </div>
-            {# <div id="quick bid">
-                <h4>quick bid</h4>
-                <form action="" methods="POST">
-                    <label for="bid">bid</label>
-                    <input type="text" name="bid_price" id="bid">
-                    <input type="hidden" name="user_id" value="getUserId()">
-                    <input type="hidden" name="auction_id" value="{{ item.auction_id }}">
-                    <input class="btn btn-success" type="submit" value="Make Bid!">
-                </form>
-            </div> #}
+    <div class="card ">
+        <div class="card-body">
+        <h5 class="card-title">{{ item.name }}</h5>
+        <h5 class="card-title">auction id:{{ item.auction_id }}</h5>
+        <p class="card-text">{{ item.auction_type }}</p>
+        <p class="card-text">{{ item.description }}</p>
+        <p class="card-text">{{ item.price }}</p>
+        <p class="card-text">{{ item.current_bid }}</p>
+        <p class="card-text">auction start:{{ item.auction_start }}</p>
+        <p class="card-text">auction end:{{ item.auction_end }}</p>
+        <p class="card-text">{{ item.status }}</p>
+        {% if item.auction_status=="on" %}
+        <a href="{{url_for('view_auction',auction_id=item.auction_id)}}" class="btn btn-primary">go to auction</a>
+        {% endif %}
         </div>
+        {# <div id="quick bid">
+            <h4>quick bid</h4>
+            <form action="" methods="POST">
+                <label for="bid">bid</label>
+                <input type="text" name="bid_price" id="bid">
+                <input type="hidden" name="user_id" value="getUserId()">
+                <input type="hidden" name="auction_id" value="{{ item.auction_id }}">
+                <input class="btn btn-success" type="submit" value="Make Bid!">
+            </form>
+        </div> #}
+    </div>
     {% endfor %}
 </div>
-{# <script src="{{url_for('static', filename='js/auction.js')}}"></src> #}
+<script src="{{url_for('static', filename='js/auction.js')}}"></script>
 
 {% include "footer.html" %}
