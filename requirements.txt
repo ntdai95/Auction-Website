@@ -1,0 +1,12 @@
+flask
+pika
+pymysql
+uuid
+requests
+Flask-JSGlue
+flask_cors
+pydantic
+bson
+pymongo
+flask_restful
+cryptography
