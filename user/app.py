@@ -17,7 +17,7 @@ def Login():
     '''
     Input: username (str), password (str)
     Func: Check user database for given user_id and password and allow user to login or deny
-    Return: "success" (str),message (str),user_id (str)
+    Return: "success" (str), message (str), user_id (str)
     '''
     query_parameters = request.args
     username = query_parameters.get('username')
