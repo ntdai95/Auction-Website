@@ -15,7 +15,7 @@ class MessageRpcServer:
 
 
     def run(self):
-        self.channel.queue_declare(queue='rpc_queue')
+        self.channel.queue_declare(queue='rpc_queue', durable=True)
         self.channel.basic_qos(prefetch_count=1)
         self.channel.basic_consume(queue='rpc_queue', on_message_callback=self.on_request)
         print(" [x] Awaiting RPC requests")

@@ -71,13 +71,13 @@ services:
       - 3312:3312
     links:
       - usersdb
-    working_dir: /AuctionWebsite/users/
+    working_dir: /AuctionWebsite/user/
     command: "flask run"
     environment:
-      FLASK_APP : user.py
+      FLASK_APP : app.py
       FLASK_RUN_PORT: 3312
       FLASK_RUN_HOST: 0.0.0.0
-      WORKING_DIRECTORY: /AuctionWebsite/users/
+      WORKING_DIRECTORY: /AuctionWebsite/user/
 
   auctionsdb:
     build: 
@@ -229,8 +229,23 @@ services:
     container_name: messagesrabbitmq
     networks:
       - netBackEnd
-    ports: 
+    ports:
       - 3314:3314
     working_dir: /AuctionWebsite/messages/
     environment:
-      WORKING_DIRECTORY: /AuctionWebsite/messages/ 
+      WORKING_DIRECTORY: /AuctionWebsite/messages/
+
+  messages:
+    build:
+      context: ./
+      dockerfile: Dockerfile_App
+    container_name: messages
+    networks:
+      - netBackEnd
+    links:
+      - messagesrabbitmq
+      - messagesmongo
+    working_dir: /AuctionWebsite/messages/
+    command: "python3 message_rpc_server.py"
+    environment:
+      WORKING_DIRECTORY: /AuctionWebsite/messages/
