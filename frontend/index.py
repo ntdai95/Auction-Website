@@ -219,6 +219,12 @@ def view_auction(auction_id):
         if res["highest_bids"]:
             res["curr_bid"] = res["highest_bids"]["bid_price"]
 
+        item_res = requests.get(f'http://{items_conf["host"]}:{items_conf["port"]}/item/get/{res["item_id"]}').json()
+        item_data = item_res.get("gotten")
+        if item_data:
+            res["name"] = item_data.get("name")
+            res["description"] = item_data.get("description")
+
         return render_template("auctions/auction.html", item=res)
     elif request.method=="POST":
         data = request.form
