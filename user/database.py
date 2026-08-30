@@ -1,3 +1,4 @@
+import os
 import pymysql
 from models import User
 import crud
@@ -5,8 +6,8 @@ import crud
 class UserDB:
     def __init__(self) -> None:
         self.__connection = pymysql.connect(host="usersdb",
-                                            user="REDACTED",
-                                            password="REDACTED",
+                                            user=os.environ["USERS_DB_USER"],
+                                            password=os.environ["USERS_DB_PASSWORD"],
                                             db="user",
                                             port=3322)
         self.__create_table()

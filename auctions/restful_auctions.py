@@ -3,6 +3,7 @@ from flask_cors import CORS
 import requests
 import pymysql
 import crud
+import os
 import sys
 import datetime
 
@@ -11,8 +12,8 @@ app = Flask(__name__)
 CORS(app)
 
 dbname = "auctions"
-user = "REDACTED"
-password = "REDACTED"
+user = os.environ["AUCTIONS_DB_USER"]
+password = os.environ["AUCTIONS_DB_PASSWORD"]
 host = "auctionsdb"
 port = 3328
 db = "auctions"

@@ -1,10 +1,11 @@
 import datetime
+import os
 import time
 import pymysql.cursors
 
 conn = pymysql.connect(host="watchlistdb",
-                       user="REDACTED",
-                       password="REDACTED",
+                       user=os.environ["WATCHLIST_DB_USER"],
+                       password=os.environ["WATCHLIST_DB_PASSWORD"],
                        db="watchlist",
                        port=3321)
 

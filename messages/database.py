@@ -1,10 +1,11 @@
+import os
 import pymongo
 import pymongo.errors
 from models import Message
 from bson.json_util import dumps
 
-USR = "REDACTED"
-PWD = "REDACTED"
+USR = os.environ["MESSAGES_MONGO_USER"]
+PWD = os.environ["MESSAGES_MONGO_PASSWORD"]
 
 class MessageDB:
     def __init__(self) -> None:

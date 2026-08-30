@@ -7,7 +7,7 @@ networks:
 
 services:
   itemsdb:
-    build: 
+    build:
       context: ./
       dockerfile: Dockerfile_MySQL
     container_name: itemsdb
@@ -17,14 +17,14 @@ services:
       - ./item:/docker-entrypoint-initdb.d
     environment:
       MYSQL_ROOT_USER: root
-      MYSQL_ROOT_PASSWORD: REDACTED
+      MYSQL_ROOT_PASSWORD: ${ITEMS_DB_PASSWORD}
       MYSQL_DATABASE: items
-      MYSQL_USER: REDACTED
-      MYSQL_PASSWORD: REDACTED
+      MYSQL_USER: ${ITEMS_DB_USER}
+      MYSQL_PASSWORD: ${ITEMS_DB_PASSWORD}
       MYSQL_TCP_PORT: 3317
-  
+
   items:
-    build: 
+    build:
       context: ./
       dockerfile: Dockerfile_App
     container_name: items
@@ -42,9 +42,11 @@ services:
       FLASK_RUN_HOST: 0.0.0.0
       FLASK_ENV: development
       WORKING_DIRECTORY: /AuctionWebsite/items/
-  
+      ITEMS_DB_USER: ${ITEMS_DB_USER}
+      ITEMS_DB_PASSWORD: ${ITEMS_DB_PASSWORD}
+
   usersdb:
-    build: 
+    build:
       context: ./
       dockerfile: Dockerfile_MySQL
     container_name: usersdb
@@ -54,14 +56,14 @@ services:
       - ./user:/docker-entrypoint-initdb.d
     environment:
       MYSQL_ROOT_USER: root
-      MYSQL_ROOT_PASSWORD: REDACTED
+      MYSQL_ROOT_PASSWORD: ${USERS_DB_PASSWORD}
       MYSQL_DATABASE: user
-      MYSQL_USER: REDACTED
-      MYSQL_PASSWORD: REDACTED
+      MYSQL_USER: ${USERS_DB_USER}
+      MYSQL_PASSWORD: ${USERS_DB_PASSWORD}
       MYSQL_TCP_PORT: 3322
 
   users:
-    build: 
+    build:
       context: ./
       dockerfile: Dockerfile_App
     container_name: users
@@ -78,9 +80,11 @@ services:
       FLASK_RUN_PORT: 3312
       FLASK_RUN_HOST: 0.0.0.0
       WORKING_DIRECTORY: /AuctionWebsite/user/
+      USERS_DB_USER: ${USERS_DB_USER}
+      USERS_DB_PASSWORD: ${USERS_DB_PASSWORD}
 
   auctionsdb:
-    build: 
+    build:
       context: ./
       dockerfile: Dockerfile_MySQL
     container_name: auctionsdb
@@ -90,14 +94,14 @@ services:
       - ./auction:/docker-entrypoint-initdb.d
     environment:
       MYSQL_ROOT_USER: root
-      MYSQL_ROOT_PASSWORD: REDACTED
+      MYSQL_ROOT_PASSWORD: ${AUCTIONS_DB_PASSWORD}
       MYSQL_DATABASE: auctions
-      MYSQL_USER: REDACTED
-      MYSQL_PASSWORD: REDACTED
+      MYSQL_USER: ${AUCTIONS_DB_USER}
+      MYSQL_PASSWORD: ${AUCTIONS_DB_PASSWORD}
       MYSQL_TCP_PORT: 3328
-  
+
   auctions:
-    build: 
+    build:
       context: ./
       dockerfile: Dockerfile_App
     container_name: auctions
@@ -115,9 +119,11 @@ services:
       FLASK_RUN_HOST: 0.0.0.0
       FLASK_ENV: development
       WORKING_DIRECTORY: /AuctionWebsite/auctions/
-  
+      AUCTIONS_DB_USER: ${AUCTIONS_DB_USER}
+      AUCTIONS_DB_PASSWORD: ${AUCTIONS_DB_PASSWORD}
+
   transactionsdb:
-    build: 
+    build:
       context: ./
       dockerfile: Dockerfile_MySQL
     container_name: transactionsdb
@@ -127,14 +133,14 @@ services:
       - ./transaction:/docker-entrypoint-initdb.d
     environment:
       MYSQL_ROOT_USER: root
-      MYSQL_ROOT_PASSWORD: REDACTED
+      MYSQL_ROOT_PASSWORD: ${TRANSACTIONS_DB_PASSWORD}
       MYSQL_DATABASE: transaction
-      MYSQL_USER: REDACTED
-      MYSQL_PASSWORD: REDACTED
+      MYSQL_USER: ${TRANSACTIONS_DB_USER}
+      MYSQL_PASSWORD: ${TRANSACTIONS_DB_PASSWORD}
       MYSQL_TCP_PORT: 3315
-  
+
   transactions:
-    build: 
+    build:
       context: ./
       dockerfile: Dockerfile_App
     container_name: transaction
@@ -151,9 +157,11 @@ services:
       FLASK_RUN_PORT: 3305
       FLASK_RUN_HOST: 0.0.0.0
       WORKING_DIRECTORY: /AuctionWebsite/transactions/
-  
+      TRANSACTIONS_DB_USER: ${TRANSACTIONS_DB_USER}
+      TRANSACTIONS_DB_PASSWORD: ${TRANSACTIONS_DB_PASSWORD}
+
   watchlistdb:
-    build: 
+    build:
       context: ./
       dockerfile: Dockerfile_MySQL
     container_name: watchlistdb
@@ -163,14 +171,14 @@ services:
       - ./watchlist:/docker-entrypoint-initdb.d
     environment:
       MYSQL_ROOT_USER: root
-      MYSQL_ROOT_PASSWORD: REDACTED
+      MYSQL_ROOT_PASSWORD: ${WATCHLIST_DB_PASSWORD}
       MYSQL_DATABASE: watchlist
-      MYSQL_USER: REDACTED
-      MYSQL_PASSWORD: REDACTED
+      MYSQL_USER: ${WATCHLIST_DB_USER}
+      MYSQL_PASSWORD: ${WATCHLIST_DB_PASSWORD}
       MYSQL_TCP_PORT: 3321
-  
+
   watchlist:
-    build: 
+    build:
       context: ./
       dockerfile: Dockerfile_App
     container_name: watchlist
@@ -187,9 +195,11 @@ services:
       FLASK_RUN_PORT: 3311
       FLASK_RUN_HOST: 0.0.0.0
       WORKING_DIRECTORY: /AuctionWebsite/watchlist/
+      WATCHLIST_DB_USER: ${WATCHLIST_DB_USER}
+      WATCHLIST_DB_PASSWORD: ${WATCHLIST_DB_PASSWORD}
 
   frontend:
-    build: 
+    build:
       context: ./
       dockerfile: Dockerfile_App
     container_name: frontend
@@ -205,7 +215,7 @@ services:
       FLASK_RUN_HOST: 0.0.0.0
       FLASK_ENV: development
       WORKING_DIRECTORY: /AuctionWebsite/frontend/
-  
+
   messagesmongo:
     build:
       context: ./
@@ -213,13 +223,13 @@ services:
     container_name: messagesmongo
     networks:
       - netBackEnd
-    ports: 
+    ports:
       - 3313:3313
     command: ["--bind_ip_all"]
     working_dir: /AuctionWebsite/messages/
     environment:
-      MONGO_INITDB_ROOT_USERNAME: REDACTED
-      MONGO_INITDB_ROOT_PASSWORD: REDACTED
+      MONGO_INITDB_ROOT_USERNAME: ${MESSAGES_MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MESSAGES_MONGO_PASSWORD}
       WORKING_DIRECTORY: /AuctionWebsite/messages/
 
   messagesrabbitmq:
@@ -249,3 +259,7 @@ services:
     command: "python3 message_rpc_server.py"
     environment:
       WORKING_DIRECTORY: /AuctionWebsite/messages/
+      MESSAGES_MONGO_USER: ${MESSAGES_MONGO_USER}
+      MESSAGES_MONGO_PASSWORD: ${MESSAGES_MONGO_PASSWORD}
+      EMAIL_ADDRESS: ${EMAIL_ADDRESS}
+      EMAIL_PASSWORD: ${EMAIL_PASSWORD}

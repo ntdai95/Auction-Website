@@ -1,10 +1,11 @@
 import datetime
+import os
 import time
 import pymysql.cursors
 
 conn = pymysql.connect(host="usersdb",
-                       user="REDACTED",
-                       password="REDACTED",
+                       user=os.environ["USERS_DB_USER"],
+                       password=os.environ["USERS_DB_PASSWORD"],
                        db="user",
                        port=3322)
 

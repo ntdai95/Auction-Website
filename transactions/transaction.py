@@ -1,3 +1,4 @@
+import os
 from os import error
 from datetime import datetime
 import pymysql.cursors
@@ -6,8 +7,8 @@ import time
 
 connection = pymysql.connect(
     host = "transactionsdb",
-    user="REDACTED",
-    password="REDACTED",
+    user=os.environ["TRANSACTIONS_DB_USER"],
+    password=os.environ["TRANSACTIONS_DB_PASSWORD"],
     db="transaction",
     port = 3315
     )
