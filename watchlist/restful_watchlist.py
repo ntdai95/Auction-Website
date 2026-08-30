@@ -63,7 +63,7 @@ def process_item_status_change():
 
     if change_type == 1:
         for user in users:
-            if (datetime.datetime.now() - user[1]).seconds < 60*24*60:
+            if user[1] is None or (datetime.datetime.now() - user[1]).seconds < 60*24*60:
                 client.SendingNotification(receiving_user_id=user[0],
                                            item_id=item_id,
                                            notification_type="itemPriceChangeWatchlist")
@@ -74,7 +74,7 @@ def process_item_status_change():
 def watching():
     user_id = request.args.get('user_id')
     items = crud.search('watchlist', 'item_id', ['user_id'], [user_id])
-    return items
+    return jsonify(items)
 
 
 if __name__ =="__main__":
