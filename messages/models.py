@@ -1,7 +1,8 @@
+from typing import Optional
 from pydantic import BaseModel
 
 
 class Message(BaseModel):
-    message_id: int = None
-    sending_user_id: int = None
-    message: str = None
+    message_id: Optional[int] = None
+    sending_user_id: Optional[int] = None
+    message: Optional[str] = None

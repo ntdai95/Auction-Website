@@ -1,13 +1,14 @@
+from typing import Optional
 from pydantic import BaseModel
 
 
 class User(BaseModel):
-    user_id: int = None
-    username: str = None
-    password: str = None
-    email: str = None
-    user_type: str = None
-    user_status: str = None
-    user_rating_sum: int = None
-    user_rating_total: int = None
-    watchlist_parameter: str = None
+    user_id: Optional[int] = None
+    username: Optional[str] = None
+    password: Optional[str] = None
+    email: Optional[str] = None
+    user_type: Optional[str] = None
+    user_status: Optional[str] = None
+    user_rating_sum: Optional[int] = None
+    user_rating_total: Optional[int] = None
+    watchlist_parameter: Optional[str] = None
