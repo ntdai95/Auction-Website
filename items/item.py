@@ -152,7 +152,11 @@ class Item:
 class Categories:
     @staticmethod
     def blacklisted(category):
-        return bool(crud.read('categories', 'category', category, ['blacklisted'])[0][0])
+        result = crud.read('categories', 'category', category, ['blacklisted'])
+        if not result:
+            return False
+
+        return bool(result[0][0])
 
     @staticmethod
     def add_item_category(category, blacklisted=False, created_by=None):
