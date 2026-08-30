@@ -18,7 +18,7 @@ def update(table, primary_key, key_value, column, column_value):
     if type(column_value) == str:
         column_value = "\"" + column_value + "\""
 
-    if not column_value:
+    if column_value is None:
         column_value = "NULL"
 
     if type(column_value) == datetime.datetime:
@@ -73,7 +73,7 @@ def create(table, inputs):
     for i in inputs.values():
         if type(i) == str:
             values.append(f"\"{i}\"")
-        elif not i:
+        elif i is None:
             values.append("NULL")
         elif type(i) == datetime.datetime:
             dte = time.strftime('%Y-%m-%d %H:%M:%S', datetime.datetime.utcnow().timetuple())
