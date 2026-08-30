@@ -1,9 +1,6 @@
-function pasteUserId(name){
-    var el = document.getElementById(name);
-    el.value=getUserId();
+var userId = localStorage.getItem("user_id");
+
+var links = document.querySelectorAll('.need_id_path');
+for (var i = 0; i < links.length; i++) {
+    links[i].href += "/" + userId;
 }
-
-// pasteUserId("user-id");
-
-var link = document.getElementById("buyNow-button");
-link.href += "/"+localStorage.getItem("user_id");

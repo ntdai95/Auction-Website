@@ -52,7 +52,7 @@
         <form action="/admin" method="POST">
 			<input type="submit" value="edit" name='see_auctions'>
         </form>
-		{% if auctions %}
+		{% if not auctions_ls %}
 		<h6> No current auctions to see. </h6>
 		{% endif%}
 	</div>
