@@ -16,7 +16,7 @@ def create(table, inputs):
     for i in inputs.values():
         if type(i) == str:
             values.append(f"\"{i}\"")
-        elif not i:
+        elif i is None:
             values.append("NULL")
         elif type(i) == datetime.datetime:
             dte = time.strftime('%Y-%m-%d %H:%M:%S', datetime.datetime.utcnow().timetuple())
