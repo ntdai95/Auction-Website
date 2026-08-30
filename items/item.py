@@ -64,6 +64,9 @@ class Item:
         '''
         Inappropriateness is a mapping from category to {True, False}.
         '''
+        if not self.categories:
+            return False
+
         for each in self.categories.split(" | "):
             if Categories.blacklisted(each):
                 client = MessageRpcClient()
