@@ -8,7 +8,7 @@ from settings import EMAIL_ADDRESS, EMAIL_PASSWORD
 
 
 class MessageRpcServer:
-    def __init__(self) -> None:
+    def __init__(self):
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(host='messagesrabbitmq'))
         self.channel = self.connection.channel()
         self.run()

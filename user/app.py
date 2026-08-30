@@ -14,11 +14,6 @@ app = Flask(__name__)
 
 @app.route("/user/login", methods=['GET'])
 def Login():
-    '''
-    Input: username (str), password (str)
-    Func: Check user database for given user_id and password and allow user to login or deny
-    Return: "success" (str), message (str), user_id (str)
-    '''
     query_parameters = request.args
     username = query_parameters.get('username')
     password = query_parameters.get('password')
@@ -35,11 +30,6 @@ def Login():
 
 @app.route("/user/create", methods=['POST'])
 def CreateUser():
-    '''
-    Input: username (str), password (str), email(str)
-    Func: Create a new user
-    Return: user_id (str)
-    '''
     username = request.args.get('username')
     password = request.args.get('password')
     email = request.args.get('email')
@@ -59,11 +49,6 @@ def CreateUser():
 
 @app.route("/user/update", methods=['POST'])
 def UpdateUser():
-    '''
-    Input: user_id (int), username (str), password (str), email(str), watchlist_parameter(str)
-    Func: Update user's information
-    Return: success(bool), message(str)
-    '''
     user_id = request.args.get('user_id', type=int)
     if not user_id:
         return jsonify({"success": False, "message": "Please, provide a user_id."})
@@ -86,11 +71,6 @@ def UpdateUser():
 
 @app.route("/user/delete", methods=['DELETE'])
 def DeleteUser():
-    '''
-    Input: user_id (int)
-    Func: Update user database and delete user
-    Return: success(bool), message(str)
-    '''
     user_id = request.args.get('user_id', type=int)
     if not user_id:
         return jsonify({"success": False, "message": "Please, provide a user_id."})
@@ -104,11 +84,6 @@ def DeleteUser():
 
 @app.route("/user/suspend", methods=['POST'])
 def SuspendUser():
-    '''
-    Input: user_id (int)
-    Func: Update user database and suspend user
-    Return: success(bool), message(str)
-    '''
     user_id = request.args.get('user_id', type=int)
     if not user_id:
         return jsonify({"success": False, "message": "Please, provide a user_id."})
@@ -123,11 +98,6 @@ def SuspendUser():
 
 @app.route("/user/rate", methods=['POST'])
 def RateUser():
-    '''
-    Input: user_id (int)
-    Func: Update user database and rate user
-    Return: success(bool), message(str)
-    '''
     user_id = request.args.get('user_id', type=int)
     user_rating_sum = request.args.get('user_rating')
     user_rating_total = 1
@@ -150,11 +120,6 @@ def RateUser():
 
 @app.route("/user/info", methods=['GET'])
 def GetUserInfo():
-    '''
-    Input: user_id (int), username(str), email(str),user_rating(int),watchlist_parameter(str)
-    Func: Get user info from user database
-    Return: success(bool), message(str), username(str), email(str),user_rating(int),watchlist_parameter(str)
-    '''
     user_id = request.args.get('user_id', type=int)
     if not user_id:
         return jsonify({"success": False, "message": "Please, provide a user_id."})
@@ -176,28 +141,22 @@ def GetUserInfo():
             return_data["watchlist_parameter"] = result[8]
         return jsonify(return_data)
     else:
-        return jsonify({"success": False, "message": "There is no user with such user_id in the user database.", 
+        return jsonify({"success": False, "message": "There is no user with such user_id in the user database.",
                         "username": None, "email": None, "user_rating": None, "watchlist_parameter": None})
 
 
 @app.route("/user/getalladmin", methods=['GET'])
 def GetAllAdmin():
-    '''
-    Input: None
-    Func: Get all admin from user database
-    Return: success(bool), message(str), admin_ids(list), emails(list)
-    '''
-    user_type = "admin"
     results = UserDB().get_all_users(params=['user_type'],values=['admin'])
     if not results:
-        return jsonify({"success": False, "message": "There is no admin in the user database.", 
+        return jsonify({"success": False, "message": "There is no admin in the user database.",
                         "admin_ids": None})
     admin_ids = []
     emails = []
     for value in results:
         admin_ids.append(value[0])
         emails.append(value[3])
-    return jsonify({"success": True, "message": "Successfully found all admins in the user database.", 
+    return jsonify({"success": True, "message": "Successfully found all admins in the user database.",
         "admin_ids": admin_ids, "emails": emails})
 
 
@@ -208,11 +167,6 @@ def GetAllAdmin():
 
 @app.route("/admin/checkadmin", methods=['GET'])
 def CheckAdmin():
-    '''
-    Input: user_id(int)
-    Func: Check if an user associated with given user_id is an admin
-    Return: success(bool), message(str), isAdmin(bool)
-    '''
     user_id = request.args.get('user_id', type=int)
 
     result = UserDB().read_user(User(user_id=user_id))
@@ -226,11 +180,6 @@ def CheckAdmin():
 
 @app.route("/admin/suspenduser", methods=['POST'])
 def AdminSuspendUser():
-    '''
-    Input: user_id (int), admin_id(int)
-    Func: Update user database and suspend user
-    Return: success(bool), message(str)
-    '''
     user_id = request.args.get('user_id', type=int)
     if not user_id:
         return jsonify({"success": False, "message": "Please, provide a user_id."})
@@ -245,15 +194,10 @@ def AdminSuspendUser():
 
 @app.route("/admin/deleteuser", methods=['DELETE'])
 def AdminDeleteUser():
-    '''
-    Input: user_id (int), admin_id(int)
-    Func: Update user database and suspend user
-    Return: success(bool), message(str)
-    '''
     user_id = request.args.get('user_id', type=int)
     if not user_id:
         return jsonify({"success": False, "message": "Please, provide an user_id."})
-    
+
     result = UserDB().delete_user(User(user_id=user_id))
     if result != 0:
         return jsonify({"success": True, "message": "User delete successful."})

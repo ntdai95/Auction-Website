@@ -12,12 +12,6 @@ client = MessageRpcClient()
 
 @app.route("/watchlist/add", methods=['POST','GET'])
 def user_add_request():
-    '''
-    Input: item_id(int), change_type(int)
-    Func: Update item's status and send notification
-    # item statuses: price change, availability change
-    Return: None
-    '''
     user_id = request.args.get('user_id')
     item_id = request.args.get('item_id')
     crud.create('watchlist',{'user_id': user_id,'item_id': item_id, 'watchlist_id': str(user_id) + item_id})
@@ -25,11 +19,6 @@ def user_add_request():
 
 @app.route("/watchlist/remove", methods=['POST','GET'])
 def user_remove_request():
-    '''
-    Input: user_id (int), item_id(int)
-    Func: Remove item to watchlist and send notification
-    Return: None
-    '''
     user_id = request.args.get('user_id')
     item_id = request.args.get('item_id')
     crud.delete('watchlist', 'watchlist_id', str(user_id) + item_id)
@@ -37,12 +26,6 @@ def user_remove_request():
 
 @app.route("/watchlist/process", methods=['POST','GET'])
 def process_item_status_change():
-    '''
-    Input: user_id (int), item_id(int)
-    Func: Reflect the change in price and availability of 
-          an item to watchlist and send notification
-    Return: None
-    '''
     item_id = request.args.get('item_id')
     change_type = request.args.get('change_type', type=int)
     props = request.args.getlist('property')

@@ -4,7 +4,7 @@ from models import User
 import crud
 
 class UserDB:
-    def __init__(self) -> None:
+    def __init__(self):
         self.__connection = pymysql.connect(host="usersdb",
                                             user=os.environ["USERS_DB_USER"],
                                             password=os.environ["USERS_DB_PASSWORD"],

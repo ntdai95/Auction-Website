@@ -8,7 +8,7 @@ USR = os.environ["MESSAGES_MONGO_USER"]
 PWD = os.environ["MESSAGES_MONGO_PASSWORD"]
 
 class MessageDB:
-    def __init__(self) -> None:
+    def __init__(self):
         self.connection = pymongo.MongoClient(f'mongodb://{USR}:{PWD}@messagesMongo:27017')
         self.db = self.connection['message_db']
         self.create_collections()
@@ -44,9 +44,6 @@ class MessageDB:
 
     def delete_message(self, message=Message):
         message_attributes = message.dict()
-        print(message_attributes)
-        for k in message_attributes.keys():
-            print(type(message_attributes[k]))
         self.message_collection.delete_one({"message_id": message_attributes["message_id"]})
 
 
