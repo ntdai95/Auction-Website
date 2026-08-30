@@ -264,7 +264,11 @@ def delete_auction(auction_id):
     Return: res(dict)
     '''
     do_query(
-        "delete from auctions  where auction_id=%s",
+        "delete from bids where auction_id=%s",
+        [auction_id])
+
+    do_query(
+        "delete from auctions where auction_id=%s",
         [auction_id])
 
     return jsonify({"status": "success"})
