@@ -1,6 +1,7 @@
 import os
 from datetime import datetime
 import pymysql.cursors
+import requests
 import time
 
 
@@ -121,11 +122,12 @@ class cart:
         Func: Add an an item to the user's cart along with its price
         Return: 200 or 400
         '''
+        price = requests.get(f"http://items:3307/item/get/{item_id}").json()["gotten"]["price"]
         cur = self.conn.cursor()
         try:
             cur.execute(
                 f'''INSERT INTO db_cart
-                VALUES ('{item_id}', {user_id}, 0, False, False);''')
+                VALUES ('{item_id}', {user_id}, {price}, False, False);''')
 
             status = 200
         except:
