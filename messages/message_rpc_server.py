@@ -24,14 +24,19 @@ class MessageRpcServer:
 
     def on_request(self, ch, method, props, body):
         parameters = json.loads(body)
-        if parameters["action"] == "ViewMessage":
-            response = self.ViewIssueMessages()
-        elif parameters["action"] == "SendMessage":
-            response = self.SendIssueMessage(parameters)
-        elif parameters["action"] == "ReplyMessage":
-            response = self.ReplyIssueMessage(parameters)
-        elif parameters["action"] == "SendNotification":
-            response = self.SendingNotification(parameters)
+        try:
+            if parameters["action"] == "ViewMessage":
+                response = self.ViewIssueMessages()
+            elif parameters["action"] == "SendMessage":
+                response = self.SendIssueMessage(parameters)
+            elif parameters["action"] == "ReplyMessage":
+                response = self.ReplyIssueMessage(parameters)
+            elif parameters["action"] == "SendNotification":
+                response = self.SendingNotification(parameters)
+            else:
+                response = {"success": False, "message": f"Unknown action: {parameters.get('action')}"}
+        except Exception as e:
+            response = {"success": False, "message": f"Server error handling {parameters.get('action')}: {e}"}
 
         ch.basic_publish(exchange='',
                          routing_key=props.reply_to,
