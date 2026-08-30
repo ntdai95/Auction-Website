@@ -66,6 +66,12 @@ def CreateNewBid():
     data = request.get_json()
 
     try:
+        highest = requests.post(
+            "http://auctions:3318/curr-highest",
+            json={"auction_id": data["auction_id"]}).json()
+        if data['bid_price'] <= highest.get('bid_price', 0):
+            return jsonify({"status": "fail", "message": "Invalid Bid, too low!"})
+
         do_query(
             "insert into bids values(default,%s,%s,%s, now())",
             [data["bid_price"],
@@ -73,10 +79,6 @@ def CreateNewBid():
             data["auction_id"]],
             res=None,
             fact="dict")
-
-        curr_highest = requests.get(f"http://auctions:3008/curr_highest?auction_id={data['auction_id']}")
-        if data['bid_price'] <= curr_highest:
-            return jsonify({"status": "fail", "message": "Invalid Bid, too low!"})
 
         requests.post(f"http://watchlist:3311/watchlist/process?item_id={data['item_id']}&change_type=1&property=price&value={data['bid_price']}")
         requests.post(f"http://items:3307/item/edit?item_id={data['item_id']}&properties=price&values={data['bid_price']}")
@@ -143,6 +145,8 @@ def curr_highest():
             res="one",
             fact="dict")
 
+        if res2 is None:
+            res2 = {"user_id": None, "bid_price": 0}
         res2["status"] = "success"
         return jsonify(res2)
 
@@ -236,7 +240,7 @@ def close_auction(auction_id):
     Return: res(dict)
     '''
     res = do_query(
-        "update auctions set auction_status='on' where auction_id=%s returning auction_id, auction_status",
+        "update auctions set auction_status='closed' where auction_id=%s returning auction_id, auction_status",
         [auction_id],
         res="one",
         fact="dict")
@@ -251,12 +255,11 @@ def delete_auction(auction_id):
     Func: Close auction
     Return: res(dict)
     '''
-    res = do_query(
+    do_query(
         "delete from auctions  where auction_id=%s",
         [auction_id])
 
-    res["status"] = "success"
-    return jsonify(res)
+    return jsonify({"status": "success"})
 
 
 @app.route("/get-winner/<int:auction_id>", methods=["GET"])
@@ -272,21 +275,21 @@ def get_winner(auction_id):
         [auction_id],
         res="one",
         fact="dict")
-    
-    if auction_res["auction_type"] == "FB":
+
+    if auction_res["auction_type"] in ("first_bid", "buy_now"):
         bid_res = do_query(
             "select * from bids where auction_id=%s order by bid_price desc limit 1",
             [auction_id],
             res="all",
             fact="dict")
 
-    if auction_res["auction_type"] == "SB":
+    if auction_res["auction_type"] == "second_bid":
         bid_res = do_query(
             "select * from bids where auction_id=%s order by bid_price desc limit 2",
             [auction_id],
             res="all",
             fact="dict")
-  
+
     auction_res["winning_bid"] = [bid_res[-1]]
     auction_res["status"] = "success"
     return jsonify(auction_res)
@@ -460,4 +463,4 @@ def list_auctions_by_item_id():
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=3308, debug=True)
+    app.run(host="0.0.0.0", port=3318, debug=True)

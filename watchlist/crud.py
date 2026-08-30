@@ -23,7 +23,7 @@ def update(table, primary_key, key_value, column, column_value):
     if not column_value:
         column_value = "NULL"
 
-    if type(column_value) == datetime:
+    if type(column_value) == datetime.datetime:
         column_value = time.strftime('%Y-%m-%d %H:%M:%S', column_value.timetuple())
         
     update = \

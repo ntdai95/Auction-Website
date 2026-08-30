@@ -1,18 +1,19 @@
+import time
 import requests
 import datetime
 
 
 auctions_conf = {
     "host": "auctions",
-    "port": 3308
+    "port": 3318
 }
 
 
-auctions_conf["host"]
 while True:
     now = datetime.datetime.now().strftime("%Y-%m-%d_%H_%M")
-    res= requests.get(f"http://{auctions_conf['host']}:{auctions_conf['port']}/auctions-to-close/{now}").json()
-    for i in res:
-        print(i)
+    res = requests.get(f"http://{auctions_conf['host']}:{auctions_conf['port']}/auctions-to-close/{now}").json()
+    for auction in res:
+        requests.get(f"http://{auctions_conf['host']}:{auctions_conf['port']}/close-auction/{auction['auction_id']}")
+        print(f"closed auction {auction['auction_id']}")
 
-    input("Press Enter to continue...")
+    time.sleep(60)

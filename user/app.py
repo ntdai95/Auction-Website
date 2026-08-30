@@ -52,11 +52,9 @@ def CreateUser():
     user_rating_sum = 0
     user_rating_total = 0
     watchlist_parameter = ""
-    print("about to request")
     result = UserDB().create_user(User(username=username, password=hashed_password, email=email, user_type=user_type,
-                                       user_status=user_status, user_rating_sum=user_rating_sum, user_rating_total=user_rating_total, 
+                                       user_status=user_status, user_rating_sum=user_rating_sum, user_rating_total=user_rating_total,
                                        watchlist_parameter=watchlist_parameter))
-    print("requested")
     return jsonify({"user_id": result})
 
 @app.route("/user/update", methods=['POST'])
@@ -189,7 +187,6 @@ def GetAllAdmin():
     '''
     user_type = "admin"
     results = UserDB().get_all_users(params=['user_type'],values=['admin'])
-    print(results)
     if not results:
         return jsonify({"success": False, "message": "There is no admin in the user database.", 
                         "admin_ids": None})

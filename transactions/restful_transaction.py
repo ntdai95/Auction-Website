@@ -5,7 +5,6 @@ from transaction import cart
 app = Flask(__name__)
 
 
-@app.route("/cart")
 @app.route("/cart/getCart_by_user", methods=['GET'])
 def getCart_by_user():
     '''
@@ -19,7 +18,6 @@ def getCart_by_user():
 
     return jsonify("Bad Request")
 
-@app.route("/cart")
 @app.route("/cart/addCart/<item>/<user>", methods=['GET'])
 def addCart(item,user):
     '''
@@ -37,7 +35,6 @@ def addCart(item,user):
 
     return jsonify("Bad Request")
 
-@app.route("/cart")
 @app.route("/cart/executeOrder", methods=['POST'])
 def executeOrder():
     '''
@@ -59,7 +56,6 @@ def executeOrder():
 
     return jsonify("Bad Request")
 
-@app.route("/cart")
 @app.route("/cart/deleteCart/<item>/<user>", methods=['DELETE'])
 def deleteCart(item, user):
     '''
@@ -73,7 +69,6 @@ def deleteCart(item, user):
 
     return jsonify("Bad Request")
 
-@app.route("/cart")
 @app.route("/cart/deleteCart_byItem", methods=['DELETE'])
 def deleteCart_byItem():
     '''

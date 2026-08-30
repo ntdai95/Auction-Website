@@ -119,7 +119,7 @@ def edit_item():
     return jsonify({'edited': item.item_id})
 
 @app.route("/item/inappropriate/", methods= ['GET'])
-def check_inappropriateness(item_id):
+def check_inappropriateness():
     '''
     Input: item_id(str)
     Func: Check if item is inappropriate or not

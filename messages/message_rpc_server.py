@@ -122,7 +122,9 @@ class MessageRpcServer:
             elif parameters["notification_type"] == "counterfeit":
                 subject = "Item's flagged as a counterfeit or it is a high value item that must be manually reviewd!"
                 body = f"Item {parameters['item_id']} was flagged. Please review."
-
+            else:
+                subject = "Notification"
+                body = f"There is an update regarding item {parameters.get('item_id')}."
 
             message = "Subject: {}\n\n{}".format(subject, body)
             self.SendingEmail(email=email, message=message)

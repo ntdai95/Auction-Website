@@ -285,7 +285,8 @@ def my_auctions(user_id):
         user_id = request.form.get('user_id')
         auction_id = request.form.get('auction_id')
         bid_price = request.form.get('bid_price')
-        request.post(f"http://{auctions_conf['host']}:{auctions_conf['port']}/create-new-bid?user_id={user_id}&auction_id={auction_id}&bid_price={bid_price}")
+        requests.post(f"http://{auctions_conf['host']}:{auctions_conf['port']}/create-new-bid",
+                      json={"user_id": user_id, "auction_id": auction_id, "bid_price": bid_price})
     
     return render_template("auctions/myauctions.html", auction_ls=user_auction_ls)
 
@@ -318,13 +319,12 @@ def view_auction(auction_id):
         if "action" in data:
             if data["action"] == "close":
                 auction_id = data["auction_id"]
-                requests.get(f'http://{auctions_conf["host"]}:{auctions_conf["port"]}/get-winner/{auction_id}')
+                res = requests.get(f'http://{auctions_conf["host"]}:{auctions_conf["port"]}/get-winner/{auction_id}').json()
 
                 data = {"item_id": res["item_id"], "user_id": res["winning_bid"][0]["user_id"]}
                 requests.get(f'http://{transactions_conf["host"]}:{transactions_conf["port"]}/cart/addCart/{data["item_id"]}/{data["user_id"]}')
 
-                close_data = {"auction_id": auction_id}
-                requests.post(f'http://{auctions_conf["host"]}:{auctions_conf["port"]}/close-auction', json=close_data)
+                requests.get(f'http://{auctions_conf["host"]}:{auctions_conf["port"]}/close-auction/{auction_id}')
                 requests.get(f'http://{auctions_conf["host"]}:{auctions_conf["port"]}/delete-auction/{auction_id}')
                 return redirect(url_for("cart", user_id=res["winning_bid"][0]["user_id"]))
 

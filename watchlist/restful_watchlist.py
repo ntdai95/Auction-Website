@@ -1,6 +1,6 @@
 import crud
 import datetime
-from flask import Flask, request
+from flask import Flask, request, jsonify
 import os
 import sys
 message_client_path = os.path.join(os.path.dirname(__file__), '../messages')
@@ -21,6 +21,7 @@ def user_add_request():
     user_id = request.args.get('user_id')
     item_id = request.args.get('item_id')
     crud.create('watchlist',{'user_id': user_id,'item_id': item_id, 'watchlist_id': str(user_id) + item_id})
+    return jsonify({"status": "success"})
 
 @app.route("/watchlist/remove", methods=['POST','GET'])
 def user_remove_request():
@@ -32,6 +33,7 @@ def user_remove_request():
     user_id = request.args.get('user_id')
     item_id = request.args.get('item_id')
     crud.delete('watchlist', 'watchlist_id', str(user_id) + item_id)
+    return jsonify({"status": "success"})
 
 @app.route("/watchlist/process", methods=['POST','GET'])
 def process_item_status_change():
@@ -42,29 +44,31 @@ def process_item_status_change():
     Return: None
     '''
     item_id = request.args.get('item_id')
-    change_type = request.args.get('change_type')
+    change_type = request.args.get('change_type', type=int)
     props = request.args.getlist('property')
     vals = request.args.getlist('value')
 
-    users = crud.read('watchlist', 'item_id', item_id,columns=['user_id'])
+    users = crud.read('watchlist', 'item_id', item_id)
     users = [(i[0], i[3]) for i in users]
     if users == []:
-        return None
+        return jsonify({"status": "success"})
 
     if change_type == 0:
         for user in users:
-            client.SendingNotification(receiving_user_id=user[0], 
+            client.SendingNotification(receiving_user_id=user[0],
                                        item_id=item_id,
                                        notification_type="itemRemovalWatchlist")
 
             crud.delete('watchlist', 'item_id', item_id)
-        
+
     if change_type == 1:
         for user in users:
-            if (datetime.datetime(user[1]) - datetime.datetime.now()).seconds < 60*24*60:
+            if (datetime.datetime.now() - user[1]).seconds < 60*24*60:
                 client.SendingNotification(receiving_user_id=user[0],
                                            item_id=item_id,
                                            notification_type="itemPriceChangeWatchlist")
+
+    return jsonify({"status": "success"})
 
 @app.route("/watchlist/watching", methods=['GET'])
 def watching():
