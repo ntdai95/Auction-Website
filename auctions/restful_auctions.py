@@ -69,7 +69,7 @@ def CreateNewBid():
         highest = requests.post(
             "http://auctions:3318/curr-highest",
             json={"auction_id": data["auction_id"]}).json()
-        if data['bid_price'] <= highest.get('bid_price', 0):
+        if float(data['bid_price']) <= float(highest.get('bid_price', 0)):
             return jsonify({"status": "fail", "message": "Invalid Bid, too low!"})
 
         do_query(
