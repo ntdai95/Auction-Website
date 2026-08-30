@@ -1,11 +1,12 @@
 {% include "header.html"%}
 <h1>Complete order</h1>
 <h2>Make payment</h2>
-{% for item in order%}
+{% for item in cart_ls %}
 <div class="card">
     <div class="row">
     <h3 class="col-md">{{ item.name }}</h3>
     <h3 class="col-sm">{{ item.price }}</h3>
+    </div>
 </div>
 {% endfor %}
 <h2>Total: {{total}}</h2>

@@ -143,7 +143,12 @@ def create_item():
 @app.route('/item/<item_id>')
 def item(item_id):
     res = requests.get(f'http://{items_conf["host"]}:{items_conf["port"]}/item/get/{item_id}').json()
-    return render_template("items/item.html", item=res.get("gotten"))
+    item_data = res.get("gotten")
+    auction_res = requests.get(f'http://{auctions_conf["host"]}:{auctions_conf["port"]}/view-auction-by-id/{item_id}').json()
+    if item_data is not None:
+        item_data["auction_id"] = auction_res.get("auction_id")
+
+    return render_template("items/item.html", item=item_data)
 
 @app.route("/delete-item", defaults={"item_id": None} ,methods=["GET","POST"])
 @app.route('/delete-item/<item_id>')
@@ -467,4 +472,4 @@ def counter():
 
 @app.route('/admin/support_messages')
 def admin_suport_messages():
-    return render_template("admin_support_messages.html")
+    return render_template("admin/admin_support_messages.html", message_ls=[])

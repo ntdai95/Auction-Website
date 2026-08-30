@@ -1,7 +1,6 @@
 {% include "header.html" %}
 <h2>Cart</h2>
 
-{{cart_ls}}
 <div id="myitems-root-cont">
     {% for item in cart_ls %}
         <div id="item-card-{{item.item_id}}" class="card ">
@@ -20,7 +19,6 @@
     {% endfor %}
 </div>
 
-</form>
 <div id="total">
     <h3>Total Amount: {{ total }}</h3>
 </div>

@@ -12,9 +12,9 @@
 
 <form action="/create-auction" method="POST">
     <select id="auction-type" name="auction_type">
-        <option value="FB">First Bid Auction</option>
-        <option value="SB">Second Bid Auction</option>
-        <option value="BN">Buy now</option>
+        <option value="first_bid">First Bid Auction</option>
+        <option value="second_bid">Second Bid Auction</option>
+        <option value="buy_now">Buy now</option>
     </select>
     <input type='hidden' name="item_id" value={{item.item_id}} >
 
@@ -26,7 +26,6 @@
     <input type="date" id="end" name="end_date">
     <label for="end_time">Auction end time</label>
     <input type="time" id="end-time" name="end_time">
-    <input type="text" hidden="true" name="item_id" value="{{ item.id }}">
     <input id="input-user-id" type="text" hidden="true" name="user_id">
     <input type="submit" value="Create Auction">
 </form>
