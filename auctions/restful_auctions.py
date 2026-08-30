@@ -222,8 +222,12 @@ def open_auction(auction_id):
     Func: Open auction
     Return: res(dict)
     '''
+    do_query(
+        "update auctions set auction_status='on' where auction_id=%s",
+        [auction_id])
+
     res = do_query(
-        "update auctions set auction_status='on' where auction_id=%s returning auction_id, auction_status",
+        "select auction_id, auction_status from auctions where auction_id=%s",
         [auction_id],
         res="one",
         fact="dict")
@@ -239,8 +243,12 @@ def close_auction(auction_id):
     Func: Close auction
     Return: res(dict)
     '''
+    do_query(
+        "update auctions set auction_status='closed' where auction_id=%s",
+        [auction_id])
+
     res = do_query(
-        "update auctions set auction_status='closed' where auction_id=%s returning auction_id, auction_status",
+        "select auction_id, auction_status from auctions where auction_id=%s",
         [auction_id],
         res="one",
         fact="dict")
