@@ -33,92 +33,6 @@ watchlist_conf = {
     "port": "3311"
 }
 
-item_ls = [
-     {
-         "name":"gba",
-         "id":"asd",
-         "description":"the gameboy color mint condition",
-         "price":"$50",
-         "current_bid":"$85",
-         "auction_start_time":"yesterday",
-         "action_end_time":"tomorrow",
-         "status":"on",
-         "auction_html":"http://www.google.com",
-         "item_id":99
-     },
-     {
-         "name":"gba",
-         "id":"QWE",
-         "description":"the gameboy color mint condition",
-         "price":"$50",
-         "current_bid":"$85",
-         "auction_start_time":"yesterday",
-         "action_end_time":"tomorrow",
-         "status":"on",
-         "auction_html":"https://www.google.com",
-         "item_id":45
-     },
-     {
-         "name":"gba",
-         "id":"123",
-         "description":"the gameboy color mint condition",
-         "price":"$50",
-         "current_bid":"$85",
-         "auction_start_time":"yesterday",
-         "action_end_time":"tomorrow",
-         "status":"on",
-         "auction_html":"https://www.google.com",
-         "item_id":3
-     }
-]
-
-cart_ls = [
-     {
-         "name":"my soul",
-         "link":"www.google.com",
-         "sold_price":"$1.00"
-     },
-     {
-         "name":"my cat",
-         "link":"www.google.com",
-         "sold_price":"$10.00"
-     }
-]
-
-auction_ls = [
-     {
-         "name":"cat",
-         "description":"the gameboy color mint condition",
-         "price":"$50",
-         "current_bid":"$85",
-         "auction_start_time":"yesterday",
-         "action_end_time":"tomorrow",
-         "status":"on",
-         "auction_html":"http://www.google.com"
-     },
-     {
-         "name":"dog",
-         "description":"the gameboy color mint condition",
-         "price":"$50",
-         "current_bid":"$85",
-         "auction_start_time":"yesterday",
-         "action_end_time":"tomorrow",
-         "status":"on",
-         "auction_html":"https://www.google.com"
-     },
-     {
-         "name":"gerbil",
-         "description":"the gameboy color mint condition",
-         "price":"$50",
-         "current_bid":"$85",
-         "auction_start_time":"yesterday",
-         "action_end_time":"tomorrow",
-         "status":"on",
-         "auction_html":"https://www.google.com"
-     }
-]
-
-
 ###################################
 # user related
 ###################################
@@ -455,13 +369,6 @@ def order(user_id):
 @app.route('/ordercomplete/<user_id>')
 @app.route('/ordercomplete', defaults={"user_id": None})
 def order_complete(user_id):
-    '''
-    Takes: user_id (str)
-    Func: Call Checkout 
-            1. Get items in the cart
-            2. Checkout in transaction microservice
-            3. Mark items as sold in items microservice
-    '''
     res = requests.get(f'http://{transactions_conf["host"]}:{transactions_conf["port"]}/cart/getCart_by_user?user_id={user_id}').json()
     requests.post(f'http://{transactions_conf["host"]}:{transactions_conf["port"]}/cart/executeOrder?user_id={user_id}')
     try:
@@ -479,9 +386,6 @@ def order_complete(user_id):
 
 @app.route('/admin', methods=['GET','POST'])
 def admin_main():
-    """
-    DELETE AND SUSPEND USERS
-    """
     delete = request.form.get('delete_user_id', None)
     suspend = request.form.get("suspend_user_id", None)
     if delete:
@@ -535,7 +439,7 @@ def admin_main():
 
 @app.route("/admin/inappropriate_items")
 def inapp():
-    items = requests.get("http://items:3307/items/flagged?field=inappropriate")
+    items = requests.get("http://items:3307/items/flagged?field=inappropriate").json()
     items_ls = []
     for i in items:
         a = requests.get(f"http://items:3307/item/get/{i}").json()
@@ -549,7 +453,7 @@ def inapp():
 
 @app.route("/admin/counterfeit_items")
 def counter():
-    items = requests.get("http://items:3307/items/flagged?field=counterfeit")
+    items = requests.get("http://items:3307/items/flagged?field=counterfeit").json()
     items_ls = []
     for i in items:
         a = requests.get(f"http://items:3307/item/get/{i}").json()

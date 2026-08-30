@@ -14,10 +14,6 @@ def test():
 
 @app.route("/item/get/<item_id>", methods=['GET'])
 def item(item_id):
-    """
-    takes item_id 
-    reuturns: dict of item
-    """
     try:
         return jsonify({"gotten": Item.load(item_id)})
     except:
@@ -25,22 +21,12 @@ def item(item_id):
 
 @app.route("/item/delete", methods=['DELETE','GET'])
 def item_delete():
-    '''
-    Input: user_id (int), item_id(int)
-    Func: Delete the item
-    Return: message(str), item_id(str)
-    '''
     item_id = request.args.get('item_id', None)
     Item.remove_item(item_id)
     return jsonify({"deleted": item_id})
 
 @app.route("/item/report_counterfeit", methods=['GET','POST'])
 def report_counterfeit():
-    '''
-    Input: item_id(str)
-    Func: Flag item as counterfeit
-    Return: None
-    '''
     item_id = request.args.get('item_id', None)
     item = Item.load(item_id)
     item.set_counterfeit_flag()
@@ -48,11 +34,6 @@ def report_counterfeit():
 
 @app.route("/item/unflag_counterfeit", methods=['POST','GET'])
 def unflag_counterfeit():
-    '''
-    Input: item_id(str)
-    Func: Unflag item as counterfeit
-    Return: None
-    '''
     item_id = request.args.get('item_id', None)
     item = Item.load(item_id)
     item.remove_counterfeit_flag()
@@ -60,11 +41,6 @@ def unflag_counterfeit():
 
 @app.route("/item/report_inappropriate", methods=['POST','GET'])
 def report_inappropriate():
-    '''
-    Input: item_id(str)
-    Func: Flag item as inappropriate
-    Return: None
-    '''
     item_id = request.args.get('item_id', None)
     item = Item.load(item_id)
     item.set_inappropriate_flag()
@@ -72,11 +48,6 @@ def report_inappropriate():
 
 @app.route("/item/unflag_inappropriate", methods=['POST','GET'])
 def unflag_inappropriate():
-    '''
-    Input: item_id(str)
-    Func: Unflag item as inappropriate
-    Return: None
-    '''
     item_id = request.args.get('item_id', None)
     item = Item.load(item_id)
     item.remove_inappropriate_flag()
@@ -84,11 +55,6 @@ def unflag_inappropriate():
 
 @app.route("/item/create", methods=['POST'])
 def create_item():
-    '''
-    Input: properties(list)
-    Func: Create an item
-    Return: message(str), item(item), item_id(str)
-    '''
     if request.method == "POST":
         item = Item()
         if request.args.getlist('properties'):
@@ -106,11 +72,6 @@ def create_item():
 
 @app.route("/item/edit", methods=['POST'])
 def edit_item():
-    '''
-    Input: properties(list), values(list), item_id(str)
-    Func: Edit item
-    Return: message(str), item(item), item_id(str)
-    '''
     properties = request.args.getlist('properties')
     values = request.args.getlist('values')
     item_id = request.args.get('item_id', None)
@@ -120,11 +81,6 @@ def edit_item():
 
 @app.route("/item/inappropriate/", methods= ['GET'])
 def check_inappropriateness():
-    '''
-    Input: item_id(str)
-    Func: Check if item is inappropriate or not
-    Return: item.check_inappropriateness() (bool)
-    '''
     if request.method == 'GET':
         item_id = request.args.get('item_id', None)
         item = Item.load(item_id)
@@ -132,25 +88,15 @@ def check_inappropriateness():
 
 @app.route("/items/flagged", methods=['GET'])
 def view_flagged_items():
-    '''
-    Input: user_id(str)
-    Func: View particular user's flagged item
-    Return: Item.view_flagged_items() (list)
-    '''
     user = request.args.get('user_id', None)
     field = request.args.get('field', None)
     if user:
         return jsonify(Item.view_flagged_items(field, user))
     else:
         return jsonify(Item.view_flagged_items(field=field))
-       
+
 @app.route("/items/allitems", methods=['GET'])
 def getitems():
-    '''
-    Input: user_id(str)
-    Func: Get all items of the user
-    Return: items (list)
-    '''
     user_id = request.args.get('user_id', None)
     item_ids = Item.search_for_item(params=['user_id'], values=[user_id])
     items = []
@@ -162,11 +108,6 @@ def getitems():
 
 @app.route("/items/search", methods=['GET'])
 def search():
-    '''
-    Input: params(list), values(list)
-    Func: Get all items of the user
-    Return: items (list)
-    '''
     params = request.args.getlist('params')
     values = request.args.getlist('values')
     item_ids = Item.search_for_item(params=params, values=values)
@@ -178,21 +119,12 @@ def search():
     return jsonify({'items': items})
 
 def is_user_admin(user_id):
-    """
-    MS: Users
-    """
     parameters = {"user_id": user_id}
     result = requests.get("http://users:3312/admin/checkadmin", params=parameters)
     return result.json()['isAdmin']
 
 @app.route("/category/add", methods=['POST'])
 def add_item_category():
-    """
-    params: 
-        add = name of category
-        blacklisted = is the category blacklisted? boolean
-        created_by = user_id object 
-    """
     if request.method == 'POST':
         category = request.args.get("category", None)
         blacklisted = request.args.get("blacklisted", None)
@@ -208,11 +140,6 @@ def add_item_category():
 
 @app.route("/category/edit", methods=['POST'])
 def modify_item_category():
-    '''
-    Input: username(str), category(str), property(list), value(list)
-    Func: Modify category
-    Return: category(str)
-    '''
     if request.method == 'POST':
         category = request.args.get("category", None)
         property = request.args.get("property", None)
@@ -228,16 +155,11 @@ def modify_item_category():
             return jsonify({category: "success"})
         except:
             return jsonify({category: "edit failed"})
-    
+
     return jsonify("Bad Request")
 
 @app.route("/category/delete", methods=['DELETE'])
 def delete_item_category():
-    '''
-    Input: username(str), category(str)
-    Func: Delete category
-    Return: category(str)
-    '''
     category = request.args.get('category', None)
     if request.method == 'DELETE':
         try:

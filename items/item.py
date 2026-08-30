@@ -28,21 +28,14 @@ class Item:
     sold: bool = False
 
     def __post_init__(self):
-        """
-            Generate an item id each time a new Item is initialized.
-        """
-
         if not self.item_id:
             self.item_id = self.generate_item_id()
             while not Item.check_unique_item_id(self.item_id):
                 self.item_id = self.generate_item_id()
 
         self.creation_date=time.strftime('%Y-%m-%d %H:%M:%S', datetime.datetime.utcnow().timetuple())
-            
+
     def batch_edit(self, keys=None, values=None):
-        """
-            Edits several properties at once.
-        """
         if not keys:
             props = vars(self)
             keys = list(props.keys())
@@ -52,7 +45,7 @@ class Item:
         crud.batch_update('items', 'item_id', self.item_id, keys,values)
         item_id = values[keys.index('item_id')] if 'item_id' in keys else self.item_id
         return Item.load(item_id)
-    
+
     @staticmethod
     def remove_item(item_id):
         crud.delete('items','item_id',item_id)
@@ -61,9 +54,6 @@ class Item:
         raise NotImplementedError()
 
     def check_inappropriateness(self):
-        '''
-        Inappropriateness is a mapping from category to {True, False}.
-        '''
         if not self.categories:
             return False
 
@@ -74,11 +64,11 @@ class Item:
                 return True
 
         return False
-   
+
     def remove_inappropriate_flag(self):
         self.inappropriate = False
         self.batch_edit(['inappropriate'], [False])
-   
+
     def set_inappropriate_flag(self):
         self.counterfeit = True
         self.batch_edit(['inappropriate'], [True])
@@ -88,7 +78,7 @@ class Item:
     def remove_counterfeit_flag(self):
         self.counterfeit = False
         self.batch_edit(['counterfeit'], [False])
-   
+
     def set_counterfeit_flag(self):
         self.counterfeit = True
         self.batch_edit(['counterfeit'], [True])
@@ -120,7 +110,6 @@ class Item:
         return get
 
     def edit_item_category(self, *, add=None, remove=None):
-        '''Change item instance's category; function requires keyword arguments.'''
         categories = set(self.categories.split("|"))
         if add:
             categories.add(add)
@@ -147,7 +136,7 @@ class Item:
         cursor = crud.conn.cursor()
         cursor.execute(unique)
         return not bool(cursor.fetchone()[0])
-    
+
     @staticmethod
     def generate_item_id():
         item_id = ''
@@ -155,11 +144,11 @@ class Item:
             item_id += random.choice(string.digits+string.ascii_letters)
 
         return item_id
-    
+
     def __str__(self):
         return str(vars(self))
-    
-        
+
+
 class Categories:
     @staticmethod
     def blacklisted(category):
@@ -173,18 +162,16 @@ class Categories:
     @staticmethod
     def modify_item_category(category, property, value):
         crud.update('categories', 'category', category, property, value)
-    
+
     @staticmethod
     def remove_item_category(category):
         crud.delete('categories', 'category', category)
-    
+
     @staticmethod
     def fetch(category):
-        """crud.read wrapper for category table;
-        """
         fetched = crud.read('categories', 'category', category)
         return fetched[0]
-    
+
     @staticmethod
     def getall():
         return crud.read('categories', 1, 1, ['category'])

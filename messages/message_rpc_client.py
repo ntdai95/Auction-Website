@@ -117,7 +117,7 @@ class MessageRpcClient(object):
     
     def NotifyAdmins(self,item_id,notification_type):
         admins = requests.get(USERS+"/user/getalladmin").json()['admin_ids']
-        print(f"[Notifyng Admins] {admins}")
+        print(f"[Notifying Admins] {admins}")
         if admins:
             for admin in admins:
                 self.SendingNotification(admin,item_id,notification_type)

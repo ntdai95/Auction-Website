@@ -63,7 +63,6 @@ def do_query(query, vars, res=None, fact=None):
 
 @app.route("/create-new-bid", methods=["POST"])
 def CreateNewBid():
-    """validate information given and create new bid returning bid object"""
     data = request.get_json()
 
     try:
@@ -102,11 +101,6 @@ def CreateNewBid():
 
 @app.route("/create-new-auction", methods=["POST"])
 def CreateNewAuction():
-    '''
-    Input: data(json)
-    Func: Create new auction
-    Return: status(str), auction_id(str)
-    '''
     data = request.get_json()
     _auction_type = data["auction_type"]
     _item_id = data["item_id"]
@@ -134,11 +128,6 @@ def CreateNewAuction():
 
 @app.route("/curr-highest", methods=["POST"])
 def curr_highest():
-    '''
-    Input: auction_id(json)
-    Func: Get the current highest bid
-    Return: status(str)
-    '''
     if "auction_id" in request.get_json():
         res2 = do_query(
             "Select user_id, bid_price from bids where auction_id=%s order by bid_price desc limit 1",
@@ -152,29 +141,8 @@ def curr_highest():
         return jsonify(res2)
 
 
-@app.route("/close-auction", methods=["POST"])
-def CloseAuction():
-    '''
-    Input: auction_id(json)
-    Func: Close auction
-    Return: status(str)
-    '''
-    if "auction_id" in request.get_json():
-        try:
-            do_query(
-                "delete from auctions where auction_id=(%s)",
-                (request.form['auction_id']))
-        except:
-            print("An error occured")
-
-
 @app.route("/user-auctions/<int:user_id>")
 def get_user_auctions(user_id):
-    '''
-    Input: user_id(json)
-    Func: Get all auctions of the user
-    Return: res(list)
-    '''
     res = do_query(
         "select * from auctions where user_id=%s",
         [user_id],
@@ -186,11 +154,6 @@ def get_user_auctions(user_id):
 
 @app.route("/auctions-to-close/<string:timestamp>", methods=["GET"])
 def get_auctions_to_close(timestamp):
-    '''
-    Input: timestamp(time)
-    Func: Close auction that reached time limit
-    Return: res(dict)
-    '''
     res = do_query(
         "select * from auctions where auction_status='on' and auction_end<(%s)",
         [timestamp],
@@ -202,11 +165,6 @@ def get_auctions_to_close(timestamp):
 
 @app.route("/auctions-to-open/<string:timestamp>", methods=["GET"])
 def get_auctions_to_open(timestamp):
-    '''
-    Input: timestamp(time)
-    Func: Open auction that reached the time
-    Return: res(dict)
-    '''
     res = do_query(
         "select * from auctions where auction_status='notst' and auction_start<to_timestamp(%s,'YYYY-MM-DD_HH:MI')",
         [timestamp],
@@ -218,11 +176,6 @@ def get_auctions_to_open(timestamp):
 
 @app.route("/open-auction/<int:auction_id>", methods=["GET"])
 def open_auction(auction_id):
-    '''
-    Input: auction_id(str)
-    Func: Open auction
-    Return: res(dict)
-    '''
     do_query(
         "update auctions set auction_status='on' where auction_id=%s",
         [auction_id])
@@ -239,11 +192,6 @@ def open_auction(auction_id):
 
 @app.route("/close-auction/<int:auction_id>", methods=["GET"])
 def close_auction(auction_id):
-    '''
-    Input: auction_id(str)
-    Func: Close auction
-    Return: res(dict)
-    '''
     do_query(
         "update auctions set auction_status='closed' where auction_id=%s",
         [auction_id])
@@ -259,11 +207,6 @@ def close_auction(auction_id):
 
 @app.route("/delete-auction/<int:auction_id>", methods=["GET"])
 def delete_auction(auction_id):
-    '''
-    Input: auction_id(str)
-    Func: Close auction
-    Return: res(dict)
-    '''
     do_query(
         "delete from bids where auction_id=%s",
         [auction_id])
@@ -277,12 +220,6 @@ def delete_auction(auction_id):
 
 @app.route("/get-winner/<int:auction_id>", methods=["GET"])
 def get_winner(auction_id):
-    '''
-    Input: auction_id(str)
-    Func: Get winner of the auction
-    Return: res(dict)
-    '''
-    
     auction_res = do_query(
         "select * from auctions where auction_id=%s",
         [auction_id],
@@ -309,11 +246,6 @@ def get_winner(auction_id):
 
 @app.route("/view-auction/<int:auction_id>", methods=["GET"])
 def view_auction(auction_id):
-    '''
-    Input: auction_id(str)
-    Func: Get info about the auction with the current highest bid
-    Return: res(dict)
-    '''
     if request.method == "GET":
         try:
             auction_res = do_query(
@@ -358,17 +290,12 @@ def view_auctions():
                 "auction_details": auction_res,
                 "bid_details": bid_res
             }
-    
+
     res["status"] = "success"
     return jsonify(res)
 
 @app.route("/change-auction", methods=["POST"])
 def change_auction():
-    '''
-    Input: auction_id(str)
-    Func: Edit the auction
-    Return: status(str)
-    '''
     data = request.get_json()
     if not data["auction_id"]:
         return jsonify({"status": "error", "message": "no auction_id"})
@@ -390,11 +317,6 @@ def change_auction():
 
 @app.route("/view-auction-by-id/<item_id>", methods=["GET"])
 def view_auction_by_item_id(item_id):
-    '''
-    Input: item_id(str)
-    Func: View auction and bid for the item
-    Return: res(dict)
-    '''
     try:
         auction_res = do_query(
             "select * from auctions where item_id=%s",
@@ -418,18 +340,13 @@ def view_auction_by_item_id(item_id):
 
 @app.route("/view-active/<int:user_id>", methods=["GET"])
 def view_active(user_id):
-    '''
-    Input: user_id(str)
-    Func: View only active auction for the user
-    Return: auctions(dict), status(str)
-    '''
     res = do_query(
         "select distinct auction_id from bids where user_id=%s",
-        (user_id),
+        [user_id],
         res="all",
         fact="dict")
 
-    auction_id_ls = [i["auction_id"] for i in res]
+    auction_id_ls = [str(i["auction_id"]) for i in res]
     if auction_id_ls:
         stmt = "select * from auctions where auction_id in (" + ",".join(auction_id_ls) + ")"
         res2 = do_query(stmt, (), res="all", fact="dict")
@@ -439,26 +356,16 @@ def view_active(user_id):
 
 @app.route("/admin-view-active", methods=["GET"])
 def admin_view_active():
-    '''
-    Input: 
-    Func: View only active auction for all users
-    Return: auctions(dict), status(str)
-    '''
     res = do_query(
         "select * from auctions WHERE auction_end > CURRENT_TIMESTAMP()",
         [],
         res="all",
         fact="dict")
-    
+
     return jsonify(res)
 
 @app.route("/list-auctions-by-id", methods=["POST"])
 def list_auctions_by_item_id():
-    '''
-    Input: data(list)
-    Func: List auctions for multiple items
-    Return: res(dict)
-    '''
     if request.method == "POST":
         data = request.get_json()
         ls = data["item_id_ls"]
@@ -466,7 +373,7 @@ def list_auctions_by_item_id():
         for i in ls:
             auction_res = do_query(
                 "select * from auctions where item_id=%s",
-                i,
+                [i],
                 res="one",
                 fact="dict")
 

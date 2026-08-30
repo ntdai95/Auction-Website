@@ -12,11 +12,6 @@ conn = pymysql.connect(host="itemsdb",
 
 
 def update(table, primary_key, key_value, column, column_value):
-    '''
-        Update a single row from {table} where 
-        the column {primary_key} equals {key_value} 
-        setting the value for column {column} to {column_value}.
-    '''
     if type(key_value) == str:
         key_value = "\"" + key_value + "\""
 
@@ -26,9 +21,9 @@ def update(table, primary_key, key_value, column, column_value):
     if not column_value:
         column_value = "NULL"
 
-    if type(column_value) == datetime:
+    if type(column_value) == datetime.datetime:
         column_value = time.strftime('%Y-%m-%d %H:%M:%S', column_value.timetuple())
-        
+
     update = \
     f"""
     UPDATE {table}
@@ -39,7 +34,7 @@ def update(table, primary_key, key_value, column, column_value):
     cursor.execute(update)
     conn.commit()
 
-def batch_update(table, primary_key, key_value, columns: list=[], column_values: list=[]):
+def batch_update(table, primary_key, key_value, columns=[], column_values=[]):
     values = []
     for i in column_values:
         bls =  ["False", "True", False, True]
@@ -65,7 +60,7 @@ def batch_update(table, primary_key, key_value, columns: list=[], column_values:
 
     update= \
     f"""
-    UPDATE {table} 
+    UPDATE {table}
     SET {paired}
     WHERE {primary_key} ={key_value};
     """
@@ -74,10 +69,6 @@ def batch_update(table, primary_key, key_value, columns: list=[], column_values:
     conn.commit()
 
 def create(table, inputs):
-    """
-    table is the tab name
-    inputs are a dict of column-value pairs
-    """
     values = []
     for i in inputs.values():
         if type(i) == str:
@@ -101,9 +92,6 @@ def create(table, inputs):
     conn.commit()
 
 def delete(from_table, primary_key, key_value):
-    """
-        from_table, to_table, primary_key, key_value
-    """
     if type(key_value) == str:
         key_value = "\"" + key_value + "\""
 
@@ -116,10 +104,7 @@ def delete(from_table, primary_key, key_value):
     cursor.execute(delete)
     conn.commit()
 
-def read(table, primary_key, key_value, columns: list=None):
-    """
-        Inputs: table, primary_key, key_value, columns as list
-    """
+def read(table, primary_key, key_value, columns=None):
     cols = None
     if type(key_value) == str:
         key_value = "\"" + key_value + "\""
@@ -131,7 +116,7 @@ def read(table, primary_key, key_value, columns: list=None):
     f"""
     SELECT {cols or "*"}
     FROM {table}
-    WHERE 
+    WHERE
         {primary_key} = {key_value}
     """
     cursor = conn.cursor()
