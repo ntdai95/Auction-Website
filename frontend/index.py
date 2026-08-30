@@ -228,13 +228,8 @@ def create_item():
 
 @app.route('/item/<item_id>')
 def item(item_id):
-    res = requests.get(f'http://{items_conf["host"]}:{items_conf["port"]}/item/get/{item_id}')
-    print(res.json())
-    #TODO
-    # res = requests.get(f'http://{auctions_conf["host"]}:{auctions_conf["port"]}/view-auction-by-id/{item_id}')
-    #Check if there is an auction for the item
-    #if not create an auction page button for it
-    return render_template("items/item.html", item=item)
+    res = requests.get(f'http://{items_conf["host"]}:{items_conf["port"]}/item/get/{item_id}').json()
+    return render_template("items/item.html", item=res.get("gotten"))
 
 @app.route("/delete-item", defaults={"item_id": None} ,methods=["GET","POST"])
 @app.route('/delete-item/<item_id>')
@@ -280,14 +275,6 @@ def my_auctions(user_id):
     res = requests.get(f'http://{auctions_conf["host"]}:{auctions_conf["port"]}/user-auctions/{user_id}')
     user_auction_ls = res.json()    
     user_auction_ls.sort(key=lambda x: datetime.strptime(x["auction_end"], "%a, %d %b %Y %H:%M:%S GMT"))
-    
-    if request.method == 'POST':
-        user_id = request.form.get('user_id')
-        auction_id = request.form.get('auction_id')
-        bid_price = request.form.get('bid_price')
-        requests.post(f"http://{auctions_conf['host']}:{auctions_conf['port']}/create-new-bid",
-                      json={"user_id": user_id, "auction_id": auction_id, "bid_price": bid_price})
-    
     return render_template("auctions/myauctions.html", auction_ls=user_auction_ls)
 
 
@@ -334,6 +321,7 @@ def view_auction(auction_id):
 @app.route('/deleteauction/<auction_id>', methods=["DELETE"])
 def deleteauction(auction_id):
     requests.get(f'http://{auctions_conf["host"]}:{auctions_conf["port"]}/delete-auction/{auction_id}')
+    return jsonify({"status": "success"})
         
 @app.route('/search', methods=["GET", "POST"])
 def search():
@@ -402,19 +390,19 @@ def settings(user_id):
 def settings_name_redirect(username, user_id):
     return render_template("settings_name_redirect.html", username=username, user_id=user_id)
 
-@app.route('/watchlist/<user_id>')
+@app.route('/watchlist/<user_id>', methods=["GET", "POST"])
 def watchlist(user_id):
-    items = requests.get(f"http://watchlist:3311/watchlist/watching?user_id={user_id}")
-    watchlist_ls = []
-    for id in items:
-        item = requests.get(f"http://items:3307/item/get?item_id={id}").json()['gotten']
-        watchlist_ls.append(item)
-
     if request.method == 'POST':
         item_id = request.form.get("item_id")
         requests.get(f"http://watchlist:3311/watchlist/remove?user_id={user_id}&item_id={item_id}")
 
-    return render_template("watchlist/watchlist.html", watchlist_ls=watchlist_ls)
+    items = requests.get(f"http://watchlist:3311/watchlist/watching?user_id={user_id}").json()
+    watchlist_ls = []
+    for row in items:
+        item = requests.get(f"http://items:3307/item/get/{row[0]}").json()['gotten']
+        watchlist_ls.append(item)
+
+    return render_template("watchlist/watchlist.html", watchlist_ls=watchlist_ls, user_id=user_id)
 
 
 ###################################
@@ -423,8 +411,8 @@ def watchlist(user_id):
 
 
 @app.route('/cart/<user_id>')
-@app.route('/cart')
-def cart(user_id): 
+@app.route('/cart', defaults={"user_id": None})
+def cart(user_id):
     res = requests.get(f'http://{transactions_conf["host"]}:{transactions_conf["port"]}/cart/getCart_by_user?user_id={user_id}')
     item_list = []
     total = 0
@@ -441,14 +429,14 @@ def cart(user_id):
 
 
 @app.route('/cart/delete/<item_id>/<user_id>')
-@app.route('/cart/delete/')
-def cart_delete(user_id, item_id): 
+@app.route('/cart/delete/', defaults={"item_id": None, "user_id": None})
+def cart_delete(user_id, item_id):
     requests.delete(f'http://{transactions_conf["host"]}:{transactions_conf["port"]}/cart/deleteCart/{item_id}/{user_id}')
     return cart(user_id)
 
 @app.route('/order/<user_id>')
-@app.route('/order')
-def order(user_id): 
+@app.route('/order', defaults={"user_id": None})
+def order(user_id):
     res = requests.get(f'http://{transactions_conf["host"]}:{transactions_conf["port"]}/cart/getCart_by_user?user_id={user_id}').json()
     item_list = []
     total = 0
@@ -465,8 +453,8 @@ def order(user_id):
 
 
 @app.route('/ordercomplete/<user_id>')
-@app.route('/ordercomplete')
-def order_complete(user_id): 
+@app.route('/ordercomplete', defaults={"user_id": None})
+def order_complete(user_id):
     '''
     Takes: user_id (str)
     Func: Call Checkout 

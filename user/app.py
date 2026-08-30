@@ -64,7 +64,7 @@ def UpdateUser():
     Func: Update user's information
     Return: success(bool), message(str)
     '''
-    user_id = int(request.args.get('user_id'))
+    user_id = request.args.get('user_id', type=int)
     if not user_id:
         return jsonify({"success": False, "message": "Please, provide a user_id."})
     username = request.args.get('username')
@@ -91,7 +91,7 @@ def DeleteUser():
     Func: Update user database and delete user
     Return: success(bool), message(str)
     '''
-    user_id = int(request.args.get('user_id'))
+    user_id = request.args.get('user_id', type=int)
     if not user_id:
         return jsonify({"success": False, "message": "Please, provide a user_id."})
 
@@ -109,7 +109,7 @@ def SuspendUser():
     Func: Update user database and suspend user
     Return: success(bool), message(str)
     '''
-    user_id = int(request.args.get('user_id'))
+    user_id = request.args.get('user_id', type=int)
     if not user_id:
         return jsonify({"success": False, "message": "Please, provide a user_id."})
 
@@ -128,7 +128,7 @@ def RateUser():
     Func: Update user database and rate user
     Return: success(bool), message(str)
     '''
-    user_id = int(request.args.get('user_id'))
+    user_id = request.args.get('user_id', type=int)
     user_rating_sum = request.args.get('user_rating')
     user_rating_total = 1
 
@@ -155,13 +155,15 @@ def GetUserInfo():
     Func: Get user info from user database
     Return: success(bool), message(str), username(str), email(str),user_rating(int),watchlist_parameter(str)
     '''
-    user_id = int(request.args.get('user_id'))
+    user_id = request.args.get('user_id', type=int)
+    if not user_id:
+        return jsonify({"success": False, "message": "Please, provide a user_id."})
     username = request.args.get('username')
     email = request.args.get('email')
     user_rating = request.args.get('user_rating')
     watchlist_parameter = request.args.get('watchlist_parameter')
-   
-    result = UserDB().read_user(User(user_id=int(user_id)))
+
+    result = UserDB().read_user(User(user_id=user_id))
     if result:
         return_data = {"success": True, "message": "Successfully found a user with the asked user_id."}
         if username:
@@ -211,7 +213,7 @@ def CheckAdmin():
     Func: Check if an user associated with given user_id is an admin
     Return: success(bool), message(str), isAdmin(bool)
     '''
-    user_id = int(request.args.get('user_id'))
+    user_id = request.args.get('user_id', type=int)
 
     result = UserDB().read_user(User(user_id=user_id))
     if result and result[4] == "admin":
@@ -229,7 +231,7 @@ def AdminSuspendUser():
     Func: Update user database and suspend user
     Return: success(bool), message(str)
     '''
-    user_id = int(request.args.get('user_id'))
+    user_id = request.args.get('user_id', type=int)
     if not user_id:
         return jsonify({"success": False, "message": "Please, provide a user_id."})
 
@@ -248,7 +250,7 @@ def AdminDeleteUser():
     Func: Update user database and suspend user
     Return: success(bool), message(str)
     '''
-    user_id = int(request.args.get('user_id'))
+    user_id = request.args.get('user_id', type=int)
     if not user_id:
         return jsonify({"success": False, "message": "Please, provide an user_id."})
     

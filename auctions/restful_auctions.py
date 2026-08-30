@@ -324,7 +324,7 @@ def view_auction(auction_id):
 
             bid_res = do_query(
                 "Select user_id, bid_price from bids where auction_id=%s order by bid_price desc limit 1",
-                (auction_id),
+                [auction_id],
                 res="one",
                 fact="dict")
         except:
@@ -371,7 +371,7 @@ def change_auction():
     '''
     data = request.get_json()
     if not data["auction_id"]:
-        return jsonify({"staus": "error", "message": "no auction_id"})
+        return jsonify({"status": "error", "message": "no auction_id"})
 
     try:
         _auction_id = data["auction_id"]
@@ -407,13 +407,13 @@ def view_auction_by_item_id(item_id):
     if not auction_res:
         return jsonify({"status": "success", "auction_id": None})
 
-    do_query(
+    bid_res = do_query(
         "with ranks as (select *, row_number() over (partition by auction_id order by bid_price desc)  as 'rank' from bids) select * from ranks where auction_id=%s and ranks.rank<=3;",
         [auction_res["auction_id"]],
         res="all",
         fact="dict")
 
-    return jsonify({"highest_bids": {}, **auction_res, "status": "success"})
+    return jsonify({"highest_bids": bid_res, **auction_res, "status": "success"})
 
 
 @app.route("/view-active/<int:user_id>", methods=["GET"])
