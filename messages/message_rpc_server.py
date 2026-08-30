@@ -79,7 +79,6 @@ class MessageRpcServer:
         email = response.json()["email"]
         if email:
             message = "Subject: {}\n\n{}".format("New response for your issue message!", parameters["message"])
-            print(f"Your parameters are: {parameters}.")
             MessageDB().delete_message(Message(message_id=parameters["message_id"]))
             self.SendingEmail(email=email, message=message)
             response = {"success": True, "message": "An email with your response has been sent to the user's email address."}
@@ -100,9 +99,8 @@ class MessageRpcServer:
                                 "user_rating": False,
                                 "watchlist_parameter": False}
         response = requests.get("http://users:3312/user/info", params=user_info_parameters)
-        email = response.json()
+        email = response.json().get("email")
         if email:
-            email = email["email"]
             if parameters["notification_type"] == "watchlist":
                 subject = "New item is matching your watchlist criteria!"
                 body = f"A new item with the item_id of {parameters['item_id']} has been found matching your watchlist criteria."

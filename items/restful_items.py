@@ -140,7 +140,7 @@ def view_flagged_items():
     user = request.args.get('user_id', None)
     field = request.args.get('field', None)
     if user:
-        return jsonify(Item.view_flagged_items(user, field))
+        return jsonify(Item.view_flagged_items(field, user))
     else:
         return jsonify(Item.view_flagged_items(field=field))
        

@@ -8,8 +8,7 @@
             <p class="card-text">{{ item.description }}</p>
             <p class="card-text">{{ item.price }}</p>
             <p class="card-text">{{ item.status }}</p>
-					  <form action="/watchlist/watching" method="POST">
-							<input type="hidden" name="user_id" class="user-id-input">
+					  <form action="/watchlist/{{ user_id }}" method="POST">
 							<input type="hidden" name="item_id" value={{item.item_id}}>
 							<input type="submit" value="delete" class="btn btn-warning">
             </div>

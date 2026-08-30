@@ -1,5 +1,4 @@
 import os
-from os import error
 from datetime import datetime
 import pymysql.cursors
 import time
@@ -65,9 +64,9 @@ class order:
             try:
                 cur.execute(
                     f'''INSERT INTO db_order (order_id, user_id, item_id, price, order_time, order_status)
-                    VALUES ({order_id}, {user_id}, '{item[0]}',100,{"NOW()"},{order_status })''')
+                    VALUES ({order_id}, {user_id}, '{item[0]}',{item[1]},{"NOW()"},{order_status })''')
                 status = 200
-            except error as e:
+            except Exception as e:
                 print(e)
                 status = 400
 
@@ -88,7 +87,7 @@ class order:
                 WHERE order_id = {order_id};''')
 
             status = 200
-        except error as e:
+        except Exception as e:
             print(e)
             status = 400
 
@@ -150,7 +149,7 @@ class cart:
                 WHERE user_id = {user_id} and item_id = '{item_id}';''')
 
             status = 200
-        except error as e:
+        except Exception as e:
             print(e)
             status = 400
 
@@ -172,7 +171,7 @@ class cart:
                     WHERE user_id = {user_id} and later = 0;''')
 
                 status = 200
-            except error as e:
+            except Exception as e:
                 print(e)
                 status = 400
         else:
@@ -182,7 +181,7 @@ class cart:
                     WHERE user_id = {user_id};''')
 
                 status = 200
-            except error as e:
+            except Exception as e:
                 print(e)
                 status = 400
 
@@ -203,7 +202,7 @@ class cart:
                 WHERE item_id = '{item_id}';''')
 
             status = 200
-        except error as e:
+        except Exception as e:
             print(e)
             status = 400
 
@@ -227,7 +226,7 @@ class cart:
             return status
 
         newOrder = order()
-        if newOrder._execute_order(user_id, items):
+        if newOrder._execute_order(user_id, items) == 200:
             self._deleteCart_by_user(user_id=user_id)
             for item in items:
                 try:

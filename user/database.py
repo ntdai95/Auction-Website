@@ -72,9 +72,7 @@ class UserDB:
     
     def get_all_users(self,params=None,values=None):
         admins = crud.search('user','user_id',params, values)
-        print(admins)
         admins = [self.read_user(User(user_id=i[0])) for i in admins]
-        print(f"2.: {admins}")
         return admins
 
     def create_user(self, user=User):
