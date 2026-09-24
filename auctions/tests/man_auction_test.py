@@ -26,11 +26,5 @@ def delete_auction():
         res = requests.post('http://localhost:5002/close-auction', data = payload)
         assert res.status_code == 200
 
-def 
-        
-    # def delete_auction(self):
-    #     pass
-    # def edit_auction(self):
-    #     pass
-    # def create_bid(self):
-    #     pass
+# Additional edit and bid scenarios can be added here when the corresponding
+# integration fixtures are available.
