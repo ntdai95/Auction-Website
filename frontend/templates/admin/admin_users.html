@@ -13,13 +13,13 @@
     <input type="hidden" name="user-id" value="{{user['id']}}">
     <input type="hidden" name="action" value="unbanned">
     <input class="btn btn-primary" type="submit" value="unban {{user['name']}}">
-<form>
+</form>
 {%else%}
 {%endif%}
 <form action="/admin/users" method="POST">
     <input type="hidden" name="user-id" value="{{user['id']}}">
     <input type="hidden" name="action" value="banned">
     <input class="btn btn-danger" type="submit" value="unban {{user['name']}}">
-<form>
+</form>
 
 {% include "footer.html" %}

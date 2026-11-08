@@ -10,7 +10,7 @@
 <form action="/admin/categories" method="POST">
     <input type="hidden" value="{{i['id']}}">
     <input type="submit" value="delete {{i['id']}}">
-<form>
+</form>
 {% endfor %}
 
 <script src="{{url_for('static', filename='js/auction.js')}}"></script>
