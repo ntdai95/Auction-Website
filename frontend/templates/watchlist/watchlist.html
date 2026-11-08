@@ -1,20 +1,43 @@
 {% include "header.html" %}
 
-<div id="myitems-root-cont">
+<h1 class="page-title">Watchlist</h1>
+<p class="page-subtitle">Items you are keeping an eye on.</p>
+
+{% if watchlist_ls %}
+<div class="card-grid">
     {% for item in watchlist_ls %}
-        <div class="card ">
-            <div class="card-body">
-            <h5 class="card-title">{{ item.name }}</h5>
-            <p class="card-text">{{ item.description }}</p>
-            <p class="card-text">{{ item.price }}</p>
-            <p class="card-text">{{ item.status }}</p>
-					  <form action="/watchlist/{{ user_id }}" method="POST">
-							<input type="hidden" name="item_id" value={{item.item_id}}>
-							<input type="submit" value="delete" class="btn btn-warning">
+    <div class="card">
+        <div class="card-body">
+            <h2 class="card-title">{{ item.name }}</h2>
+            <p class="card-meta">
+                {% if item.status == "on" %}
+                <span class="badge-pill badge-live">Live</span>
+                {% else %}
+                <span class="badge-pill badge-ended">{{ item.status }}</span>
+                {% endif %}
+            </p>
+
+            <p class="card-description">{{ item.description }}</p>
+
+            <div class="price-row">
+                <div class="price-block">
+                    <span class="label">Price</span>
+                    <span class="value">${{ item.price }}</span>
+                </div>
             </div>
+
+            <form action="/watchlist/{{ user_id }}" method="POST">
+                <input type="hidden" name="item_id" value="{{ item.item_id }}">
+                <button type="submit" class="btn btn-outline-secondary btn-sm btn-block-full">Remove from watchlist</button>
+            </form>
         </div>
+    </div>
     {% endfor %}
 </div>
+{% else %}
+<div class="empty-state">
+    Nothing on your watchlist yet. Add items from <a href="{{ url_for('search') }}">search</a>.
+</div>
+{% endif %}
 
-{# <script src="{{url_for('static', filename='js/auction.js')}}"></src> #}
 {% include "footer.html" %}

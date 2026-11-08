@@ -8,7 +8,7 @@ if (admin=="True"){
     admin=false;
 }
 
-myStorage = window.localStorage;
+var myStorage = window.localStorage;
 myStorage.setItem('user_name', username);
 myStorage.setItem('user_id', userId);
 myStorage.setItem('is_admin', admin);

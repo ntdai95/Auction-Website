@@ -1,21 +1,31 @@
 {% include "header.html" %}
 
-<div id="auction-root-cont">
-    <h1>Create New item</h1>
+<h1 class="page-title">Create a new item</h1>
+<p class="page-subtitle">Add something you own. You can open an auction on it afterwards.</p>
+
+<div class="panel" style="max-width: 480px;">
     <form action="/create-item" method="POST">
-        <label for="name" required>Item Name</label>
-        <input name="name">
-        <label for="description" required>Item description</label>
-        <input name="description">
-        <label for="price" >price</label>
-        <input name="price" required>
-        <label for="categories" required>Category</label>
-        <input name="categories">
-        <input type="hidden" name="user_id" id="user-id" required>
-        <button type="submit">Add Item</button>
+        <div class="field">
+            <label for="name">Item name</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        <div class="field">
+            <label for="description">Item description</label>
+            <input type="text" id="description" name="description" required>
+        </div>
+        <div class="field">
+            <label for="price">Price</label>
+            <input type="number" step="0.01" min="0" id="price" name="price" required>
+        </div>
+        <div class="field">
+            <label for="categories">Category</label>
+            <input type="text" id="categories" name="categories" required>
+        </div>
+        <input type="hidden" name="user_id" id="user-id">
+        <button class="btn btn-primary" type="submit">Add item</button>
     </form>
 </div>
-<script src="{{url_for('static', filename='js/create-item.js')}}"></script>
 
+<script src="{{ url_for('static', filename='js/create-item.js') }}"></script>
 
 {% include "footer.html" %}

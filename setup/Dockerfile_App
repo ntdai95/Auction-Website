@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM ubuntu:24.04
 RUN apt-get update 
 RUN apt-get install -y git 
 RUN apt-get install -y python3 
@@ -6,6 +6,6 @@ RUN apt-get install -y python3-pip
 RUN apt-get install -y net-tools
 RUN apt-get install -y vim
 RUN apt-get install -y iputils-ping
-RUN git clone https://github.com/ntdai95/AuctionWebsite.git
+COPY . /AuctionWebsite
 WORKDIR /AuctionWebsite/setup
 RUN pip3 install --break-system-packages -r requirements.txt

@@ -1,4 +1,5 @@
 import pika
+import time
 import uuid
 import json
 import requests
@@ -7,9 +8,34 @@ import requests
 USERS = "http://users:3312"
 
 
+
+def connect_to_rabbitmq(host="messagesrabbitmq", attempts=30, delay=2):
+    """Open a broker connection, waiting for the broker to come up.
+
+    RabbitMQ is started by the same compose file as this service, so on a cold
+    start it is usually still booting when this runs.
+
+    Args:
+        host: the broker hostname on the compose network
+        attempts: how many times to try before giving up
+        delay: seconds to wait between tries
+    Returns:
+        an open pika BlockingConnection
+    """
+    for attempt in range(1, attempts + 1):
+        try:
+            return pika.BlockingConnection(pika.ConnectionParameters(host=host))
+        except pika.exceptions.AMQPConnectionError:
+            if attempt == attempts:
+                raise
+            print("rabbitmq not ready yet, retrying in %ss (%s/%s)"
+                  % (delay, attempt, attempts), flush=True)
+            time.sleep(delay)
+
+
 class MessageRpcClient(object):
     def __init__(self):
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host='messagesrabbitmq'))
+        self.connection = connect_to_rabbitmq()
         self.channel = self.connection.channel()
         result = self.channel.queue_declare(queue='', exclusive=True)
         self.callback_queue = result.method.queue

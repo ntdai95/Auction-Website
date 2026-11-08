@@ -1,4 +1,4 @@
-myStorage = window.localStorage;
+var myStorage = window.localStorage;
 var userId = myStorage.getItem('user_id');
 
 var els = document.querySelectorAll('.need_id');

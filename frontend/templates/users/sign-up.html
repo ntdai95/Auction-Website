@@ -1,17 +1,30 @@
 {% include "header.html" %}
 
-<form action="/sign-up" method='POST'>
-  <label for="username">username</label>
-  <input type="text" id='username' name="username">
-  <label for="password">password</label>
-  <input type="password" id='password' name="password">
-  <label for="email">email</label>
-  <input type="email" id='email' name="email">
-  <input type="submit" value="sign in">
-</form>
+<h1 class="page-title">Create an account</h1>
+<p class="page-subtitle">You need an account to bid on or list an item.</p>
 
 {% if error %}
-<h2> There was an issue with the sign up. Please try again later.</h2>
-{%endif%}
+<div class="empty-state" style="color: #b91c1c; border-color: #fecaca;">
+    There was an issue with the sign up. Please try again later.
+</div>
+{% endif %}
+
+<div class="panel" style="max-width: 420px;">
+    <form action="/sign-up" method="POST">
+        <div class="field">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" autocomplete="username" required>
+        </div>
+        <div class="field">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" autocomplete="new-password" required>
+        </div>
+        <div class="field">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" autocomplete="email" required>
+        </div>
+        <button class="btn btn-primary" type="submit">Create account</button>
+    </form>
+</div>
 
 {% include "footer.html" %}

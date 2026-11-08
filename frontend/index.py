@@ -206,9 +206,24 @@ def view_participating_auctions(user_id):
     res= requests.get(f'http://{auctions_conf["host"]}:{auctions_conf["port"]}/view-active/{user_id}')
     try:
         user_auction_ls = res.json()["auctions"]
-        return render_template("auctions/active-auctions.html", auction_ls=user_auction_ls)
     except:
         return render_template("auctions/active-auctions.html", auction_ls=[])
+
+    # the auctions service returns the auction row on its own, so the item name
+    # and the current bid are fetched here the same way view_auction does them
+    for auction in user_auction_ls:
+        item_res = requests.get(f'http://{items_conf["host"]}:{items_conf["port"]}/item/get/{auction["item_id"]}').json()
+        item_data = item_res.get("gotten")
+        if item_data:
+            auction["name"] = item_data.get("name")
+            auction["description"] = item_data.get("description")
+            auction["price"] = item_data.get("price")
+
+        bid_res = requests.get(f'http://{auctions_conf["host"]}:{auctions_conf["port"]}/view-auction/{auction["auction_id"]}').json()
+        if bid_res.get("highest_bids"):
+            auction["current_bid"] = bid_res["highest_bids"]["bid_price"]
+
+    return render_template("auctions/active-auctions.html", auction_ls=user_auction_ls)
 
 
 @app.route('/auction', defaults={"auction_id":None}, methods=["POST"])

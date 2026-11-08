@@ -1,34 +1,48 @@
 {% include "header.html" %}
-<h2>Cart</h2>
 
-<div id="myitems-root-cont">
+<h1 class="page-title">Cart</h1>
+<p class="page-subtitle">Items you have chosen to buy outright.</p>
+
+{% if cart_ls %}
+<div class="card-grid">
     {% for item in cart_ls %}
-        <div id="item-card-{{item.item_id}}" class="card ">
-            <div class="card-body">
-         <!--<img src="rubberduck.jpg" alt="Coding duck">-->
-            <h5 class="card-title">{{ item.name }}</h5>
-            <p class="card-text">{{ item.description }}</p>
-            <p class="card-text">{{ item.price }}</p>
-            <p class="card-text">{{ item.categories }}</p>
-            </div>
-            <div>
+    <div id="item-card-{{ item.item_id }}" class="card">
+        <div class="card-body">
+            <h2 class="card-title">{{ item.name }}</h2>
+            {% if item.categories %}
+            <p class="card-meta">{{ item.categories }}</p>
+            {% endif %}
 
-           <a id="delete-button" href='http://localhost:3309/cart/delete/{{item.item_id}}' class="btn btn-primary">'Delete this item'</a>
+            <p class="card-description">{{ item.description }}</p>
+
+            <div class="price-row">
+                <div class="price-block">
+                    <span class="label">Price</span>
+                    <span class="value">${{ item.price }}</span>
+                </div>
             </div>
+
+            <a href="http://localhost:3309/cart/delete/{{ item.item_id }}" class="btn btn-outline-secondary btn-sm btn-block-full">Remove from cart</a>
         </div>
+    </div>
     {% endfor %}
 </div>
 
-<div id="total">
-    <h3>Total Amount: {{ total }}</h3>
+<div class="panel mt-3">
+    <div class="price-row" style="border-top: none; padding-top: 0;">
+        <div class="price-block">
+            <span class="label">Total</span>
+            <span class="value bid">${{ total }}</span>
+        </div>
+    </div>
+    <a id="order-button" href="{{ url_for('order', user_id=None) }}" class="btn btn-primary">Proceed with order</a>
 </div>
-    <a id="order-button" href='{{ url_for("order",user_id=None) }}' class="btn btn-primary">'proceed with order'</a>
+{% else %}
+<div class="empty-state">
+    Your cart is empty. Find something on <a href="{{ url_for('search') }}">search</a>.
+</div>
+{% endif %}
 
+<script src="{{ url_for('static', filename='js/cart.js') }}"></script>
 
-
-<script src="{{url_for('static', filename='js/cart.js')}}"></script>
-
-
-{% include "footer.html" %} 
-
-{# https://stackoverflow.com/questions/15029016/calculating-totals-when-clicking-checkboxes #}
+{% include "footer.html" %}
