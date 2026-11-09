@@ -37,36 +37,25 @@ class UserDB:
 
     def read_user(self, user=User):
         user_attributes = user.dict()
-        sql_query = "SELECT * FROM user WHERE "
+        # the login form reaches here with an unauthenticated username, so the
+        # value is bound as a parameter rather than pasted into the statement
+        columns = ["user_id", "username", "password", "email", "user_type",
+                   "user_status", "user_rating_sum", "user_rating_total",
+                   "watchlist_parameter"]
         conditions = []
+        params = []
+        for column in columns:
+            if user_attributes[column]:
+                conditions.append(f"{column} = %s")
+                params.append(user_attributes[column])
 
-        if user_attributes["user_id"]:
-            conditions.append(f"user_id = '{user_attributes['user_id']}'")
-        if user_attributes["username"]:
-            conditions.append(f"username = '{user_attributes['username']}'")
-        if user_attributes["password"]:
-            conditions.append(f"password = '{user_attributes['password']}'")
-        if user_attributes["email"]:
-            conditions.append(f"email = '{user_attributes['email']}'")
-        if user_attributes["user_type"]:
-            conditions.append(f"user_type = '{user_attributes['user_type']}'")
-        if user_attributes["user_status"]:
-            conditions.append(f"user_status = '{user_attributes['user_status']}'")
-        if user_attributes["user_rating_sum"]:
-            conditions.append(f"user_rating_sum = '{user_attributes['user_rating_sum']}'")
-        if user_attributes["user_rating_total"]:
-            conditions.append(f"user_rating_total = '{user_attributes['user_rating_total']}'")
-        if user_attributes["watchlist_parameter"]:
-            conditions.append(f"watchlist_parameter = '{user_attributes['watchlist_parameter']}'")
-        
-        if conditions ==[]:
+        if not conditions:
             return None
-        for i in range(len(conditions) - 1):
-            sql_query += conditions[i] + " AND "
-        sql_query += f"{conditions[-1]};"
+
+        sql_query = "SELECT * FROM user WHERE " + " AND ".join(conditions) + ";"
 
         cursor = self.__connection.cursor()
-        cursor.execute(sql_query)
+        cursor.execute(sql_query, params)
         result = cursor.fetchone()
         return result
     
@@ -77,14 +66,15 @@ class UserDB:
 
     def create_user(self, user=User):
         user_attributes = user.dict()
-        sql_query = "INSERT INTO user (username, password, email, user_type, user_status, user_rating_sum, user_rating_total, watchlist_parameter) " + \
-                    f"VALUES ('{user_attributes['username']}', '{user_attributes['password']}', '{user_attributes['email']}', '{user_attributes['user_type']}', " + \
-                    f"'{user_attributes['user_status']}', '{user_attributes['user_rating_sum']}', '{user_attributes['user_rating_total']}', " + \
-                    f"'{user_attributes['watchlist_parameter']}')"
+        columns = ["username", "password", "email", "user_type", "user_status",
+                   "user_rating_sum", "user_rating_total", "watchlist_parameter"]
+        sql_query = ("INSERT INTO user (" + ", ".join(columns) + ") "
+                     "VALUES (" + ", ".join(["%s"] * len(columns)) + ")")
+        params = [user_attributes[column] for column in columns]
 
         cursor = self.__connection.cursor()
         with self.__connection:
-            cursor.execute(sql_query)
+            cursor.execute(sql_query, params)
             self.__connection.commit()
             user_id = cursor.lastrowid
         return user_id
@@ -92,40 +82,40 @@ class UserDB:
     
     def update_user(self, user=User):
         user_attributes = user.dict()
-        sql_query = "UPDATE user SET "
+        # the two rating columns accumulate, so their placeholder is the amount
+        # added rather than the whole clause
+        setters_by_column = {
+            "username": "username = %s",
+            "password": "password = %s",
+            "email": "email = %s",
+            "user_status": "user_status = %s",
+            "user_rating_sum": "user_rating_sum = user_rating_sum + %s",
+            "user_rating_total": "user_rating_total = user_rating_total + %s",
+            "watchlist_parameter": "watchlist_parameter = %s",
+        }
         setters = []
-        if user_attributes["username"]:
-            setters.append(f"username = '{user_attributes['username']}'")
-        if user_attributes["password"]:
-            setters.append(f"password = '{user_attributes['password']}'")
-        if user_attributes["email"]:
-            setters.append(f"email = '{user_attributes['email']}'")
-        if user_attributes["user_status"]:
-            setters.append(f"user_status = '{user_attributes['user_status']}'")
-        if user_attributes["user_rating_sum"]:
-            setters.append(f"user_rating_sum = user_rating_sum + '{user_attributes['user_rating_sum']}'")
-        if user_attributes["user_rating_total"]:
-            setters.append(f"user_rating_total = user_rating_total + '{user_attributes['user_rating_total']}'")
-        if user_attributes["watchlist_parameter"]:
-            setters.append(f"watchlist_parameter = '{user_attributes['watchlist_parameter']}'")
-        
-        for i in range(len(setters) - 1):
-            sql_query += setters[i] + ", "
-        sql_query += f"{setters[-1]} WHERE user_id = '{user_attributes['user_id']}';"
+        params = []
+        for column, clause in setters_by_column.items():
+            if user_attributes[column]:
+                setters.append(clause)
+                params.append(user_attributes[column])
+
+        sql_query = "UPDATE user SET " + ", ".join(setters) + " WHERE user_id = %s;"
+        params.append(user_attributes["user_id"])
 
         cursor = self.__connection.cursor()
         with self.__connection:
-            result = cursor.execute(sql_query)
+            result = cursor.execute(sql_query, params)
             self.__connection.commit()
         return result
 
     
     def delete_user(self, user=User):
         user_attributes = user.dict()
-        sql_query = f"DELETE FROM user WHERE user_id = '{user_attributes['user_id']}'; "
+        sql_query = "DELETE FROM user WHERE user_id = %s;"
 
         cursor = self.__connection.cursor()
         with self.__connection:
-            result = cursor.execute(sql_query)
+            result = cursor.execute(sql_query, [user_attributes["user_id"]])
             self.__connection.commit()
         return result
