@@ -3,7 +3,18 @@
 <h1 class="page-title">New auction</h1>
 <p class="page-subtitle">Opening an auction on {{ item.name }}.</p>
 
-<div class="panel" style="max-width: 520px;">
+<div class="detail">
+    <div class="detail-figure">
+        {% if item.image_url %}
+        <img src="{{ item.image_url }}" alt="{{ item.name }}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="thumb thumb-1" style="display: none;">{{ (item.name | string)[:1] | upper }}</div>
+        {% else %}
+        <div class="thumb thumb-1">{{ (item.name | string)[:1] | upper }}</div>
+        {% endif %}
+    </div>
+
+    <div class="detail-col">
+    <div class="panel">
     <form action="/create-auction" method="POST">
         <div class="field">
             <label for="auction-type">Auction type</label>
@@ -35,6 +46,8 @@
         <input type="hidden" id="input-user-id" name="user_id">
         <button class="btn btn-primary" type="submit">Create auction</button>
     </form>
+    </div>
+    </div>
 </div>
 
 <script src="{{ url_for('static', filename='js/create-auction.js') }}"></script>

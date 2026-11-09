@@ -1,3 +1,4 @@
+{% from "item_thumb.html" import item_thumb %}
 {% include "header.html" %}
 
 <h1 class="page-title">My items</h1>
@@ -9,6 +10,7 @@
 <div class="card-grid">
     {% for item in item_ls %}
     <div id="item-card-{{ item.item_id }}" class="card">
+        {{ item_thumb(item, loop.index0) }}
         <div class="card-body">
             <h2 class="card-title">{{ item.name }}</h2>
             {% if item.categories %}
@@ -19,7 +21,7 @@
 
             <div class="price-row">
                 <div class="price-block">
-                    <span class="label">Original price</span>
+                    <span class="label">Price</span>
                     <span class="value">${{ item.price }}</span>
                 </div>
                 {% if item.sold %}
@@ -32,8 +34,8 @@
 
             {% if item.auction_id %}
             <div class="time-row">
-                <span>Opens {{ item.auction_start }}</span>
-                <span>Closes {{ item.auction_end }}</span>
+                <span>Opens {{ item.auction_start | auction_time }}</span>
+                <span>Closes {{ item.auction_end | auction_time }}</span>
             </div>
             <a href="{{ url_for('view_auction', auction_id=item.auction_id) }}" class="btn btn-primary btn-block-full">Go to auction</a>
             {% else %}

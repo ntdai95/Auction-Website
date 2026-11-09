@@ -8,6 +8,15 @@ from decimal import Decimal
 app = Flask(__name__)
 jsglue = JSGlue(app)
 
+
+@app.template_filter('auction_time')
+def auction_time(value):
+    """The services hand back RFC 822 timestamps, which read badly on a card."""
+    try:
+        return datetime.strptime(value, "%a, %d %b %Y %H:%M:%S %Z").strftime("%d %b %Y, %H:%M")
+    except (TypeError, ValueError):
+        return value
+
 items_conf = {
     "host": "items",
     "port": "3307"
@@ -91,6 +100,20 @@ def sign_up():
             return render_template("users/sign-up.html", error=True)
 
 
+def fetch_item(item_id):
+    """Read one item row from the items service, or None if it is not there.
+
+    Six routes hold only an item id but need the name, the price and the
+    picture, so the call lives here instead of being written out at each one.
+    """
+    try:
+        res = requests.get(f'http://{items_conf["host"]}:{items_conf["port"]}/item/get/{item_id}').json()
+    except Exception:
+        return None
+
+    return res.get("gotten")
+
+
 ###################################
 # item specific
 ###################################
@@ -148,8 +171,7 @@ def create_item():
 
 @app.route('/item/<item_id>')
 def item(item_id):
-    res = requests.get(f'http://{items_conf["host"]}:{items_conf["port"]}/item/get/{item_id}').json()
-    item_data = res.get("gotten")
+    item_data = fetch_item(item_id)
     auction_res = requests.get(f'http://{auctions_conf["host"]}:{auctions_conf["port"]}/view-auction-by-id/{item_id}').json()
     if item_data is not None:
         item_data["auction_id"] = auction_res.get("auction_id")
@@ -171,18 +193,11 @@ def delete_item(item_id):
 @app.route("/create-auction", defaults={"item_id": None}, methods=["GET","POST"])
 @app.route("/create-auction/<item_id>", methods=["GET","POST"])
 def create_auction(item_id):
-    if item_id:
-        item_dict={
-            "name": "item_placeholder_name",
-            "picture": "",
-            "item_id": item_id
-        }
-    else:
-        item_dict={
-            "name": "asdbajsd",
-            "picture": "",
-            "item_id": 1
-        }
+    # the page names the item the auction is for, so the row is read here. It
+    # used to be a literal placeholder, which the heading printed verbatim.
+    item_dict = fetch_item(item_id) if item_id else None
+    if not item_dict:
+        item_dict = {"name": "this item", "item_id": item_id}
 
     if request.method == "POST":
         data = request.form.to_dict()
@@ -198,8 +213,26 @@ def create_auction(item_id):
 @app.route("/my-auctions/<int:user_id>", methods=["GET"])
 def my_auctions(user_id):
     res = requests.get(f'http://{auctions_conf["host"]}:{auctions_conf["port"]}/user-auctions/{user_id}')
-    user_auction_ls = res.json()    
+    user_auction_ls = res.json()
     user_auction_ls.sort(key=lambda x: datetime.strptime(x["auction_end"], "%a, %d %b %Y %H:%M:%S GMT"))
+
+    # this endpoint returns the auction row alone, so each card would otherwise
+    # be titled with a bare item id and carry no picture
+    for auction in user_auction_ls:
+        item_data = fetch_item(auction["item_id"])
+        if item_data:
+            auction["name"] = item_data.get("name")
+            auction["description"] = item_data.get("description")
+            auction["price"] = item_data.get("price")
+            auction["image_url"] = item_data.get("image_url")
+
+        # this endpoint carries a winning bid, which is only set once the
+        # auction closes, so the live figure is read the way the auction page
+        # reads it
+        bid_res = requests.get(f'http://{auctions_conf["host"]}:{auctions_conf["port"]}/view-auction/{auction["auction_id"]}').json()
+        if bid_res.get("highest_bids"):
+            auction["current_bid"] = bid_res["highest_bids"]["bid_price"]
+
     return render_template("auctions/myauctions.html", auction_ls=user_auction_ls)
 
 
@@ -218,12 +251,12 @@ def view_participating_auctions(user_id):
     # the auctions service returns the auction row on its own, so the item name
     # and the current bid are fetched here the same way view_auction does them
     for auction in user_auction_ls:
-        item_res = requests.get(f'http://{items_conf["host"]}:{items_conf["port"]}/item/get/{auction["item_id"]}').json()
-        item_data = item_res.get("gotten")
+        item_data = fetch_item(auction["item_id"])
         if item_data:
             auction["name"] = item_data.get("name")
             auction["description"] = item_data.get("description")
             auction["price"] = item_data.get("price")
+            auction["image_url"] = item_data.get("image_url")
 
         bid_res = requests.get(f'http://{auctions_conf["host"]}:{auctions_conf["port"]}/view-auction/{auction["auction_id"]}').json()
         if bid_res.get("highest_bids"):
@@ -240,11 +273,13 @@ def view_auction(auction_id):
         if res["highest_bids"]:
             res["curr_bid"] = res["highest_bids"]["bid_price"]
 
-        item_res = requests.get(f'http://{items_conf["host"]}:{items_conf["port"]}/item/get/{res["item_id"]}').json()
-        item_data = item_res.get("gotten")
+        item_data = fetch_item(res["item_id"])
         if item_data:
             res["name"] = item_data.get("name")
             res["description"] = item_data.get("description")
+            res["price"] = item_data.get("price")
+            res["categories"] = item_data.get("categories")
+            res["image_url"] = item_data.get("image_url")
 
         return render_template("auctions/auction.html", item=res)
     elif request.method=="POST":
@@ -345,10 +380,36 @@ def watchlist(user_id):
     items = requests.get(f"http://watchlist:3311/watchlist/watching?user_id={user_id}").json()
     watchlist_ls = []
     for row in items:
-        item = requests.get(f"http://items:3307/item/get/{row[0]}").json()['gotten']
-        watchlist_ls.append(item)
+        item = fetch_item(row[0])
+        # an item deleted while it sat on a watchlist used to raise here
+        if item:
+            watchlist_ls.append(item)
 
     return render_template("watchlist/watchlist.html", watchlist_ls=watchlist_ls, user_id=user_id)
+
+
+@app.route('/watch/<item_id>/<user_id>')
+def watch_item(item_id, user_id):
+    requests.get(f'http://{watchlist_conf["host"]}:{watchlist_conf["port"]}/watchlist/add',
+                 params={"item_id": item_id, "user_id": user_id})
+    return redirect(url_for('watchlist', user_id=user_id))
+
+@app.route('/unwatch/<item_id>/<user_id>')
+def unwatch_item(item_id, user_id):
+    requests.get(f'http://{watchlist_conf["host"]}:{watchlist_conf["port"]}/watchlist/remove',
+                 params={"item_id": item_id, "user_id": user_id})
+    return redirect(url_for('watchlist', user_id=user_id))
+
+@app.route('/report/<flag>/<item_id>')
+def report_item(flag, item_id):
+    # the search card used to link straight at the items service, so reporting
+    # an item left the site and showed the caller a page of json
+    if flag not in ("inappropriate", "counterfeit"):
+        return redirect(url_for('search'))
+
+    requests.get(f'http://{items_conf["host"]}:{items_conf["port"]}/item/report_{flag}',
+                 params={"item_id": item_id})
+    return redirect(url_for('item', item_id=item_id))
 
 
 ###################################
@@ -364,10 +425,12 @@ def cart(user_id):
     total = 0
     try:
         for each in res.json():
-            id = each[0]
-            item = requests.get(f'http://{items_conf["host"]}:{items_conf["port"]}/item/get/{id}') 
-            item_list.append(item.json()['gotten'])
-            total += Decimal(item.json()['gotten']['price'])
+            item = fetch_item(each[0])
+            if not item:
+                continue
+
+            item_list.append(item)
+            total += Decimal(item['price'])
 
         return render_template("transactions/cart.html", cart_ls=item_list, total=total)
     except Exception:
@@ -383,15 +446,19 @@ def cart_delete(user_id, item_id):
 @app.route('/order/<user_id>')
 @app.route('/order', defaults={"user_id": None})
 def order(user_id):
-    res = requests.get(f'http://{transactions_conf["host"]}:{transactions_conf["port"]}/cart/getCart_by_user?user_id={user_id}').json()
+    res = requests.get(f'http://{transactions_conf["host"]}:{transactions_conf["port"]}/cart/getCart_by_user?user_id={user_id}')
     item_list = []
     total = 0
     try:
-        for each in res:
-            id = each[0]
-            item = requests.get(f'http://{items_conf["host"]}:{items_conf["port"]}/item/get/{id}') 
-            item_list.append(item.json()['gotten'])
-            total += Decimal(item.json()['gotten']['price'])
+        # an empty cart answers with no body at all, so decoding it has to sit
+        # inside the guard rather than above it
+        for each in res.json():
+            item = fetch_item(each[0])
+            if not item:
+                continue
+
+            item_list.append(item)
+            total += Decimal(item['price'])
 
         return render_template("transactions/order.html", cart_ls=item_list, total=total)
     except Exception:
@@ -401,10 +468,10 @@ def order(user_id):
 @app.route('/ordercomplete/<user_id>')
 @app.route('/ordercomplete', defaults={"user_id": None})
 def order_complete(user_id):
-    res = requests.get(f'http://{transactions_conf["host"]}:{transactions_conf["port"]}/cart/getCart_by_user?user_id={user_id}').json()
+    res = requests.get(f'http://{transactions_conf["host"]}:{transactions_conf["port"]}/cart/getCart_by_user?user_id={user_id}')
     requests.post(f'http://{transactions_conf["host"]}:{transactions_conf["port"]}/cart/executeOrder?user_id={user_id}')
     try:
-        for each in res:
+        for each in res.json():
             parameters = {'item_id': each[0], 'properties': 'sold','values': 1}
             requests.post(f'http://{items_conf["host"]}:{items_conf["port"]}/item/edit', params=parameters)
     except Exception:
@@ -455,47 +522,52 @@ def admin_main():
 
         requests.post(f"http://items:3307/category/edit?category={category}&value={blacklisted}&property=blacklisted")
 
-    auctions_ls = []
     if request.form.get("see_auctions"):
-        res= requests.get(f'http://{auctions_conf["host"]}:{auctions_conf["port"]}/admin-view-active')
+        res = requests.get(f'http://{auctions_conf["host"]}:{auctions_conf["port"]}/admin-view-active')
         if not res:
             auction_ls = []
         else:
-            auction_ls=res.json()            
-            auction_ls.sort(key=lambda x:datetime.strptime(x["auction_end"], "%a, %d %b %Y %H:%M:%S GMT"))
+            auction_ls = res.json()
+            auction_ls.sort(key=lambda x: datetime.strptime(x["auction_end"], "%a, %d %b %Y %H:%M:%S GMT"))
 
-        if not auctions_ls:
-            return render_template("admin/adminauctions.html", auction_ls=auction_ls, auctions=True)
+        # the endpoint returns auction rows, so each card is given the name,
+        # the price and the picture of the item it is selling
+        for auction in auction_ls:
+            item_data = fetch_item(auction["item_id"])
+            if item_data:
+                auction["name"] = item_data.get("name")
+                auction["price"] = item_data.get("price")
+                auction["image_url"] = item_data.get("image_url")
 
-    return render_template("admin/admin.html", categories=categories, auctions_ls=auctions_ls)
+            bid_res = requests.get(f'http://{auctions_conf["host"]}:{auctions_conf["port"]}/view-auction/{auction["auction_id"]}').json()
+            if bid_res.get("highest_bids"):
+                auction["current_bid"] = bid_res["highest_bids"]["bid_price"]
+
+        return render_template("admin/adminauctions.html", auction_ls=auction_ls, auctions=True)
+
+    return render_template("admin/admin.html", categories=categories)
 
 @app.route("/admin/inappropriate_items")
 def inapp():
     items = requests.get("http://items:3307/items/flagged?field=inappropriate").json()
     items_ls = []
     for i in items:
-        a = requests.get(f"http://items:3307/item/get/{i}").json()
-        try:
-            if a:
-                items_ls.append(a['gotten'])
-        except Exception:
-            pass
+        a = fetch_item(i)
+        if a:
+            items_ls.append(a)
 
-    return render_template("admin/inapp.html", items_ls=items_ls)
+    return render_template("admin/inapp.html", item_ls=items_ls)
 
 @app.route("/admin/counterfeit_items")
 def counter():
     items = requests.get("http://items:3307/items/flagged?field=counterfeit").json()
     items_ls = []
     for i in items:
-        a = requests.get(f"http://items:3307/item/get/{i}").json()
-        try:
-            if a:
-                items_ls.append(a['gotten'])
-        except Exception:
-            pass
+        a = fetch_item(i)
+        if a:
+            items_ls.append(a)
 
-    return render_template("admin/counter.html", items_ls=items_ls)
+    return render_template("admin/counter.html", item_ls=items_ls)
 
 @app.route('/admin/support_messages')
 def admin_suport_messages():

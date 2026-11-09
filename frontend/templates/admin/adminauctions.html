@@ -1,29 +1,54 @@
+{% from "item_thumb.html" import item_thumb %}
 {% include "admin_header.html" %}
 
-<div id="myitems-root-cont">
+<h1 class="page-title">All auctions</h1>
+<p class="page-subtitle">Open auctions across the site, soonest to close first.</p>
+
+{% if auction_ls %}
+<div class="card-grid">
     {% for item in auction_ls %}
-    <div class="card ">
-        <img class="card-img-top" style="
-            width: 200px;
-            height: 15vw;
-            object-fit: cover;" src="static/images/250px-Nintendo-Game-Boy-Advance-Purple-FL.jpeg" alt="Card image cap">
-
+    <div class="card">
+        {{ item_thumb(item, loop.index0) }}
         <div class="card-body">
-            <h5 class="card-title">{{ item.item_id }}</h5>
-            <p class="card-text">{{ item.current_bid }}</p>
-            <p class="card-text">{{ item.price }}</p>
-            <p class="card-text">{{ item.auction_id }}</p>
-            <p class="card-text">{{ item.auction_start }}</p>
-            <p class="card-text">{{ item.auction_end }}</p>
-            <p class="card-text">{{ item.auction_status }}</p>
-            {% if item.auction_status=="on" %}
-            <a href="{{ url_for('view_auction', auction_id=item.auction_id) }}" class="btn btn-primary">go to auction</a>
-            {% endif %}
-        </div>
+            <h2 class="card-title">{{ item.name or "Item #" ~ item.item_id }}</h2>
+            <p class="card-meta">
+                Auction #{{ item.auction_id }}
+                {% if item.auction_status == "on" %}
+                <span class="badge-pill badge-live">Live</span>
+                {% else %}
+                <span class="badge-pill badge-ended">{{ item.auction_status }}</span>
+                {% endif %}
+            </p>
 
-        <a href="{{ url_for('item', item_id=item.item_id) }}" class= "btn btn-primary">view item</a>
+            <div class="price-row">
+                <div class="price-block">
+                    {% if item.current_bid %}
+                    <span class="label">Current bid</span>
+                    <span class="value bid">${{ item.current_bid }}</span>
+                    {% else %}
+                    <span class="label">Asking price</span>
+                    <span class="value">${{ item.price }}</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="time-row">
+                <span>Opens {{ item.auction_start | auction_time }}</span>
+                <span>Closes {{ item.auction_end | auction_time }}</span>
+            </div>
+
+            {% if item.auction_status == "on" %}
+            <a href="{{ url_for('view_auction', auction_id=item.auction_id) }}" class="btn btn-primary btn-block-full">Go to auction</a>
+            {% endif %}
+            <a href="{{ url_for('item', item_id=item.item_id) }}" class="btn btn-outline-secondary btn-sm btn-block-full mt-2">View item</a>
+        </div>
     </div>
     {% endfor %}
 </div>
+{% else %}
+<div class="empty-state">
+    No auctions are open right now.
+</div>
+{% endif %}
 
 {% include "admin_footer.html" %}

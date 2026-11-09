@@ -128,7 +128,7 @@ def delete(from_table, primary_key, key_value):
     cursor.execute(delete)
     conn.commit()
 
-def read(table, primary_key, key_value, columns=None):
+def read(table, primary_key, key_value, columns=None, as_dict=False):
     cols = None
     if type(key_value) == str:
         key_value = "\"" + key_value + "\""
@@ -145,7 +145,12 @@ def read(table, primary_key, key_value, columns=None):
     """
     cursor = conn.cursor()
     cursor.execute(get)
-    return cursor.fetchall()
+    rows = cursor.fetchall()
+    if as_dict:
+        names = [d[0] for d in cursor.description]
+        return [dict(zip(names, row)) for row in rows]
+
+    return rows
 
 def search(table, primary_key, properties, search_values):
     values = []

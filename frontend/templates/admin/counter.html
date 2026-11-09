@@ -1,18 +1,37 @@
+{% from "item_thumb.html" import item_thumb %}
 {% include "admin_header.html" %}
 
-<div id="myitems-root-cont">
+<h1 class="page-title">Flagged: counterfeit</h1>
+<p class="page-subtitle">Items reported as counterfeit, waiting on a decision.</p>
+
+{% if item_ls %}
+<div class="card-grid">
     {% for item in item_ls %}
-    <div id="item-card-{{item.item_id}}" class="card ">
+    <div id="item-card-{{ item.item_id }}" class="card">
+        {{ item_thumb(item, loop.index0) }}
         <div class="card-body">
-            <h5 class="card-title">name:{{ item.name }}</h5>
-            <p class="card-text">description:{{ item.description }}</p>
-            <div>
-                <a href='http://localhost:3307/item/delete?item_id={{item.item_id}}' class="btn btn-primary">Delete</a>
-                <a href='http://localhost:3307/item/unflag_counterfeit?item_id={{item.item_id}}' class="btn btn-primary">Not Counterfeit</a>
+            <h2 class="card-title">{{ item.name }}</h2>
+            <p class="card-meta">Item #{{ item.item_id }}{% if item.categories %} &middot; {{ item.categories }}{% endif %}</p>
+
+            <p class="card-description">{{ item.description }}</p>
+
+            <div class="price-row">
+                <div class="price-block">
+                    <span class="label">Price</span>
+                    <span class="value">${{ item.price }}</span>
+                </div>
             </div>
+
+            <a href="http://localhost:3307/item/delete?item_id={{ item.item_id }}" class="btn btn-danger btn-block-full">Delete item</a>
+            <a href="http://localhost:3307/item/unflag_counterfeit?item_id={{ item.item_id }}" class="btn btn-outline-secondary btn-sm btn-block-full mt-2">Clear the flag</a>
         </div>
     </div>
     {% endfor %}
 </div>
+{% else %}
+<div class="empty-state">
+    Nothing is flagged as counterfeit.
+</div>
+{% endif %}
 
 {% include "admin_footer.html" %}

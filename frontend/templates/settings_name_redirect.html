@@ -1,12 +1,14 @@
-{% include "header.html"%}
+{% include "header.html" %}
 
-{{ JSGlue.include() }}
+<h1 class="page-title">Saving your settings</h1>
+<p class="page-subtitle">One moment.</p>
 
-<h2>redirecting</h2>
+{# settings-name-redirect.js reads the two ids below #}
 <div style="display: none;">
-  <div id="username">{{username}}</div>
-  <div id="user-id">{{user_id}}</div>
+  <div id="username">{{ username }}</div>
+  <div id="user-id">{{ user_id }}</div>
 </div>
-<script src="{{url_for('static', filename='js/settings-name-redirect.js')}}"></script>
 
-{% include "footer.html"%}
+<script src="{{ url_for('static', filename='js/settings-name-redirect.js') }}"></script>
+
+{% include "footer.html" %}

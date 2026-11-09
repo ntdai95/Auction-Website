@@ -1,30 +1,43 @@
-{% include "header.html"%}
-<h1>Complete order</h1>
-<h2>Make payment</h2>
-{% for item in cart_ls %}
-<div class="card">
-    <div class="row">
-    <h3 class="col-md">{{ item.name }}</h3>
-    <h3 class="col-sm">{{ item.price }}</h3>
+{% include "header.html" %}
+
+<h1 class="page-title">Complete order</h1>
+<p class="page-subtitle">Check the items, then pick a payment method.</p>
+
+<div class="panel">
+    <div class="table-wrap">
+        <table>
+            <tr>
+                <th>Item</th>
+                <th>Price</th>
+            </tr>
+            {% for item in cart_ls %}
+            <tr>
+                <td>{{ item.name }}</td>
+                <td>${{ item.price }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <div class="price-row">
+        <div class="price-block">
+            <span class="label">Total</span>
+            <span class="value bid">${{ total }}</span>
+        </div>
     </div>
 </div>
-{% endfor %}
-<h2>Total: {{total}}</h2>
-<div id="payment-cont">
-    Pay by:
-    <button>
-            <div class="col-md">
-                <div class="card-type">Debit card</div>
-                <div class="card-number">Card ending with 1234</div>
-            </div>
-            <div class="col-sm">
-            </div>
-    </button>
 
+<div class="panel" id="payment-cont">
+    <h4>Pay by</h4>
+    <div class="field">
+        <label for="payment">Card</label>
+        <select id="payment" name="payment">
+            <option value="debit">Debit card ending 1234</option>
+        </select>
     </div>
+    <a id="complete-button" href="{{ url_for('order_complete', user_id=None) }}" class="btn btn-primary">Place order</a>
+</div>
 
-<!--<button class="btn btn-primary">Make payment</button>-->
+<script src="{{ url_for('static', filename='js/order.js') }}"></script>
 
-<a id="complete-button" href='{{ url_for("order_complete",user_id=None) }}' class="btn btn-primary">Proceed with order</a>
-<script src="{{url_for('static', filename='js/order.js')}}"></script>
-{% include "footer.html"%}
+{% include "footer.html" %}

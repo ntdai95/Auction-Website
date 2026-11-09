@@ -1,9 +1,18 @@
 {% include "header.html" %}
 
-{% for i in message_ls %}
-<a href="#" class="btn btn-primary">{{i["message"]|truncate(1024, True)}}</a>
-{% endfor %}
+<h1 class="page-title">Support messages</h1>
+<p class="page-subtitle">Messages users have sent to support.</p>
 
-<script src="{{url_for('static', filename='js/auction.js')}}"></script>
+{% if message_ls %}
+<div class="panel">
+    {% for i in message_ls %}
+    <p>{{ i["message"] | truncate(1024, True) }}</p>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    No support messages.
+</div>
+{% endif %}
 
 {% include "footer.html" %}

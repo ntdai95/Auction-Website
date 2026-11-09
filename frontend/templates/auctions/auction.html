@@ -3,7 +3,7 @@
 <h1 class="page-title">{{ item.name }}</h1>
 <p class="page-subtitle">
     Auction #{{ item.auction_id }}
-    <span class="badge-pill badge-type">{{ item.auction_type }}</span>
+    <span class="badge-pill badge-type">{{ item.auction_type | replace("_", " ") | title }}</span>
     {% if item.auction_status == "on" %}
     <span class="badge-pill badge-live">Live</span>
     {% else %}
@@ -11,46 +11,60 @@
     {% endif %}
 </p>
 
-<div class="panel">
-    <p>{{ item.description }}</p>
-
-    <div class="price-row">
-        <div class="price-block">
-            <span class="label">Highest bid</span>
-            {% if item.curr_bid %}
-            <span class="value bid">${{ item.curr_bid }}</span>
-            {% else %}
-            <span class="value none">No bids yet</span>
-            {% endif %}
-        </div>
+<div class="detail">
+    <div class="detail-figure">
+        {% if item.image_url %}
+        <img src="{{ item.image_url }}" alt="{{ item.name }}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="thumb thumb-1" style="display: none;">{{ ((item.name or item.item_id) | string)[:1] | upper }}</div>
+        {% else %}
+        <div class="thumb thumb-1">{{ ((item.name or item.item_id) | string)[:1] | upper }}</div>
+        {% endif %}
     </div>
 
-    <div class="time-row">
-        <span>Opens {{ item.auction_start }}</span>
-        <span>Closes {{ item.auction_end }}</span>
-    </div>
-</div>
+    <div class="detail-col">
+        <div class="panel">
+            <p>{{ item.description }}</p>
 
-<div class="panel">
-    <h4>Place a bid</h4>
-    <form action="/auction/{{ item.auction_id }}" method="POST">
-        <div class="field">
-            <label for="bid">Your bid</label>
-            <input type="number" step="0.01" min="0" name="bid_price" id="bid" required>
+            <div class="price-row">
+                <div class="price-block">
+                    {% if item.curr_bid %}
+                    <span class="label">Highest bid</span>
+                    <span class="value bid">${{ item.curr_bid }}</span>
+                    {% else %}
+                    <span class="label">Asking price</span>
+                    <span class="value">${{ item.price }}</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="time-row">
+                <span>Opens {{ item.auction_start | auction_time }}</span>
+                <span>Closes {{ item.auction_end | auction_time }}</span>
+            </div>
         </div>
-        <input type="hidden" name="user_id" id="user-id" required>
-        <input type="hidden" name="auction_id" id="auction_id" value="{{ item.auction_id }}">
-        <button class="btn btn-primary" type="submit">Place bid</button>
-    </form>
-</div>
 
-<div class="panel" id="admin-console" style="display: none;">
-    <h4>Seller controls</h4>
-    <form action="/auction" method="POST">
-        <input type="hidden" name="action" value="close">
-        <input type="hidden" name="auction_id" value="{{ item.auction_id }}">
-        <button class="btn btn-outline-warning" type="submit">Close auction</button>
-    </form>
+        <div class="panel">
+            <h4>Place a bid</h4>
+            <form action="/auction/{{ item.auction_id }}" method="POST">
+                <div class="field">
+                    <label for="bid">Your bid</label>
+                    <input type="number" step="0.01" min="0" name="bid_price" id="bid" required>
+                </div>
+                <input type="hidden" name="user_id" id="user-id" required>
+                <input type="hidden" name="auction_id" id="auction_id" value="{{ item.auction_id }}">
+                <button class="btn btn-primary" type="submit">Place bid</button>
+            </form>
+        </div>
+
+        <div class="panel" id="admin-console" style="display: none;">
+            <h4>Seller controls</h4>
+            <form action="/auction" method="POST">
+                <input type="hidden" name="action" value="close">
+                <input type="hidden" name="auction_id" value="{{ item.auction_id }}">
+                <button class="btn btn-outline-warning" type="submit">Close auction</button>
+            </form>
+        </div>
+    </div>
 </div>
 
 <script src="{{ url_for('static', filename='js/bidding.js') }}"></script>

@@ -12,6 +12,7 @@ CREATE TABLE items (
     counterfeit BOOL,
     inappropriate BOOL,
     price DECIMAL(15,2) UNSIGNED,
+    image_url TEXT,
     sold BOOL
 );
 

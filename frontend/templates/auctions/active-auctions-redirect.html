@@ -1,6 +1,8 @@
-{% include "header.html"%}
+{% include "header.html" %}
 
-<h2>redirecting</h2>
-<script src="{{url_for('static', filename='js/active-redirect.js')}}"></script>
+<h1 class="page-title">Active auctions</h1>
+<p class="page-subtitle">One moment.</p>
 
-{% include "footer.html"%}
+<script src="{{ url_for('static', filename='js/active-redirect.js') }}"></script>
+
+{% include "footer.html" %}

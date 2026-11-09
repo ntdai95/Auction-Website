@@ -1,3 +1,4 @@
+{% from "item_thumb.html" import item_thumb %}
 {% include "header.html" %}
 
 <h1 class="page-title">Search</h1>
@@ -16,45 +17,62 @@
 {% if item_ls %}
 <div class="card-grid">
     {% for item in item_ls %}
+    {% set auction = item.auction_info if item.auction_info and item.auction_info.auction_id else None %}
     <div class="card">
-        <div class="thumb thumb-{{ (loop.index0 % 6) + 1 }}">{{ (item.name | string)[:1] | upper }}</div>
+        {{ item_thumb(item, loop.index0) }}
         <div class="card-body">
             <h2 class="card-title">{{ item.name }}</h2>
-            {% if item.categories %}
-            <p class="card-meta">{{ item.categories }}</p>
-            {% endif %}
+            <p class="card-meta">
+                {% if item.categories %}{{ item.categories }}{% endif %}
+                {% if auction %}
+                {% if auction.auction_status == "on" %}
+                <span class="badge-pill badge-live">Live</span>
+                {% else %}
+                <span class="badge-pill badge-ended">Closed</span>
+                {% endif %}
+                {% endif %}
+            </p>
 
             <p class="card-description">{{ item.description }}</p>
 
+            {# a bid rewrites the item's own price, so showing both on an
+               auctioned item prints the same figure twice #}
             <div class="price-row">
+                {% if auction %}
+                <div class="price-block">
+                    <span class="label">Highest bid</span>
+                    {% if auction.highest_bids %}
+                    <span class="value bid">${{ auction.highest_bids[0].bid_price }}</span>
+                    {% else %}
+                    <span class="value none">No bids yet</span>
+                    {% endif %}
+                </div>
+                {% else %}
                 <div class="price-block">
                     <span class="label">Price</span>
                     <span class="value">${{ item.price }}</span>
                 </div>
+                {% endif %}
             </div>
 
-            {% if item.auction_info and item.auction_info.auction_id %}
+            {% if auction %}
             <div class="time-row">
-                <span>Opens {{ item.auction_info.auction_start_time }}</span>
-                <span>Closes {{ item.auction_info.auction_endtime }}</span>
+                <span>Opens {{ auction.auction_start | auction_time }}</span>
+                <span>Closes {{ auction.auction_end | auction_time }}</span>
             </div>
-            <a href="{{ url_for('view_auction', auction_id=item.auction_info.auction_id) }}" class="btn btn-primary btn-block-full">Go to auction</a>
+            <a href="{{ url_for('view_auction', auction_id=auction.auction_id) }}" class="btn btn-primary btn-block-full">Go to auction</a>
             {% endif %}
 
-            {% if item.status == "on" %}
-            <a href="{{ item.html }}" class="btn btn-primary btn-block-full">Go to auction</a>
-            {% endif %}
-
-            <a href="http://localhost:3305/cart/addCart/{{ item.item_id }}" class="need_id_path btn btn-primary btn-block-full">Buy now</a>
+            <a href="http://localhost:3305/cart/addCart/{{ item.item_id }}" class="need_id_path btn {{ 'btn-outline-secondary' if auction else 'btn-primary' }} btn-block-full">Buy now</a>
 
             <div class="action-row">
-                <a href="http://localhost:3307/item/{{ item.item_id }}">Item page</a>
-                <a href="http://localhost:3311/watchlist/add?item_id={{ item.item_id }}&user_id=" class="need_id">Watch</a>
-                <a href="http://localhost:3311/watchlist/remove?item_id={{ item.item_id }}&user_id=" class="need_id">Unwatch</a>
+                <a href="{{ url_for('item', item_id=item.item_id) }}">Item page</a>
+                <a href="/watch/{{ item.item_id }}" class="need_id_path">Watch</a>
+                <a href="/unwatch/{{ item.item_id }}" class="need_id_path">Unwatch</a>
             </div>
             <div class="action-row muted">
-                <a href="http://localhost:3307/item/report_inappropriate?item_id={{ item.item_id }}">Report inappropriate</a>
-                <a href="http://localhost:3307/item/report_counterfeit?item_id={{ item.item_id }}">Report counterfeit</a>
+                <a href="{{ url_for('report_item', flag='inappropriate', item_id=item.item_id) }}">Report inappropriate</a>
+                <a href="{{ url_for('report_item', flag='counterfeit', item_id=item.item_id) }}">Report counterfeit</a>
             </div>
         </div>
     </div>
@@ -65,6 +83,5 @@
 {% endif %}
 
 <script src="{{ url_for('static', filename='js/buyNow.js') }}"></script>
-<script src="{{ url_for('static', filename='js/search.js') }}"></script>
 
 {% include "footer.html" %}

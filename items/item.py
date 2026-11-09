@@ -25,6 +25,7 @@ class Item:
     counterfeit: bool = False
     inappropriate: bool = False
     price: float = 1000000000
+    image_url: str = None
     sold: bool = False
 
     def __post_init__(self):
@@ -119,8 +120,10 @@ class Item:
 
     @staticmethod
     def load(item_id):
-        result = crud.read('items', 'item_id', item_id)[0]
-        return Item(*result)
+        # keyed by column name, so adding a column to the table cannot
+        # shift the value of every field after it
+        row = crud.read('items', 'item_id', item_id, as_dict=True)[0]
+        return Item(**row)
 
     def write(self):
         crud.create('items',vars(self))

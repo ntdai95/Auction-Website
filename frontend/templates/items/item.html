@@ -1,24 +1,55 @@
 {% include "header.html" %}
 
-<div id="auction-root-cont">
-    <h1>{{item.name}}</h1>
-        <div class="card ">
-            <img class="card-img-top" style="
-                width: 200px;
-                height: 15vw;
-                object-fit: cover;" src="static/images/250px-Nintendo-Game-Boy-Advance-Purple-FL.jpeg" alt="Card image cap">
-            <div class="card-body">
-            <h5 class="card-title">{{ item.name }}</h5>
-            <p class="card-text">{{ item.description }}</p>
-            <p class="card-text">{{ item.price }}</p>
-            <p class="card-text">{{ item.categories }}</p>
-            {% if item.auction_id %}
-            <a href="{{ url_for('view_auction', auction_id=item.auction_id) }}" class="btn btn-primary">go to auction</a>
-            {% else %}
-            <a href="{{ url_for('create_auction', item_id=item.item_id) }}" class="btn btn-primary">create auction</a>
-            {% endif %}
+{% if item %}
+<h1 class="page-title">{{ item.name }}</h1>
+<p class="page-subtitle">
+    {% if item.categories %}
+    <span class="badge-pill badge-type">{{ item.categories }}</span>
+    {% endif %}
+    {% if item.sold %}
+    <span class="badge-pill badge-ended">Sold</span>
+    {% endif %}
+</p>
+
+<div class="detail">
+    <div class="detail-figure">
+        {% if item.image_url %}
+        <img src="{{ item.image_url }}" alt="{{ item.name }}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="thumb thumb-1" style="display: none;">{{ (item.name | string)[:1] | upper }}</div>
+        {% else %}
+        <div class="thumb thumb-1">{{ (item.name | string)[:1] | upper }}</div>
+        {% endif %}
+    </div>
+
+    <div class="detail-col">
+        <div class="panel">
+            <p>{{ item.description }}</p>
+
+            <div class="price-row">
+                <div class="price-block">
+                    <span class="label">Price</span>
+                    <span class="value">${{ item.price }}</span>
+                </div>
+                {% if item.sold %}
+                <div class="price-block">
+                    <span class="label">Sold for</span>
+                    <span class="value bid">${{ item.sold }}</span>
+                </div>
+                {% endif %}
             </div>
+
+            {% if item.auction_id %}
+            <a href="{{ url_for('view_auction', auction_id=item.auction_id) }}" class="btn btn-primary">Go to auction</a>
+            {% else %}
+            <a href="{{ url_for('create_auction', item_id=item.item_id) }}" class="btn btn-primary">Create auction</a>
+            {% endif %}
         </div>
+    </div>
 </div>
+{% else %}
+<div class="empty-state">
+    That item is no longer listed. Try <a href="{{ url_for('search') }}">search</a>.
+</div>
+{% endif %}
 
 {% include "footer.html" %}

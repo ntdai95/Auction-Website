@@ -14,7 +14,14 @@ client = MessageRpcClient()
 def user_add_request():
     user_id = request.args.get('user_id')
     item_id = request.args.get('item_id')
-    crud.create('watchlist',{'user_id': user_id,'item_id': item_id, 'watchlist_id': str(user_id) + item_id})
+    watchlist_id = str(user_id) + item_id
+    if crud.read('watchlist', 'watchlist_id', watchlist_id):
+        # watching an item twice used to raise a duplicate key error and
+        # answer 500, so clicking Watch again looked like a broken site
+        return jsonify({"status": "success"})
+
+    crud.create('watchlist', {'user_id': user_id, 'item_id': item_id,
+                              'watchlist_id': watchlist_id})
     return jsonify({"status": "success"})
 
 @app.route("/watchlist/remove", methods=['POST','GET'])

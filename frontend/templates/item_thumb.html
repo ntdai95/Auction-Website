@@ -1,0 +1,12 @@
+{# The picture of an item, with the card's position for the fallback tile.
+   Every grid page shows one, so the markup lives here rather than in six
+   templates. Items with no picture, and pictures whose link has gone dead,
+   fall back to a coloured tile carrying the first letter of the name. #}
+{% macro item_thumb(item, index) -%}
+{% if item.image_url %}
+<img class="thumb-img" src="{{ item.image_url }}" alt="{{ item.name }}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+<div class="thumb thumb-{{ (index % 6) + 1 }}" style="display: none;">{{ ((item.name or item.item_id) | string)[:1] | upper }}</div>
+{% else %}
+<div class="thumb thumb-{{ (index % 6) + 1 }}">{{ ((item.name or item.item_id) | string)[:1] | upper }}</div>
+{% endif %}
+{%- endmacro %}

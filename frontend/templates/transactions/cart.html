@@ -1,3 +1,4 @@
+{% from "item_thumb.html" import item_thumb %}
 {% include "header.html" %}
 
 <h1 class="page-title">Cart</h1>
@@ -7,6 +8,7 @@
 <div class="card-grid">
     {% for item in cart_ls %}
     <div id="item-card-{{ item.item_id }}" class="card">
+        {{ item_thumb(item, loop.index0) }}
         <div class="card-body">
             <h2 class="card-title">{{ item.name }}</h2>
             {% if item.categories %}
@@ -22,7 +24,7 @@
                 </div>
             </div>
 
-            <a href="http://localhost:3309/cart/delete/{{ item.item_id }}" class="btn btn-outline-secondary btn-sm btn-block-full">Remove from cart</a>
+            <a href="/cart/delete/{{ item.item_id }}" class="need_id_path btn btn-outline-secondary btn-sm btn-block-full">Remove from cart</a>
         </div>
     </div>
     {% endfor %}

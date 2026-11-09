@@ -1,5 +1,11 @@
-{% include "header.html"%}
-<h1>Thank you for your order!</h1>
-<h2>Items will be shipped within a few year</h2>
+{% include "header.html" %}
 
-{% include "footer.html"%}
+<h1 class="page-title">Order placed</h1>
+<p class="page-subtitle">Thank you. A confirmation is on its way to your email.</p>
+
+<div class="panel">
+    <p>Your items leave the warehouse within two working days.</p>
+    <a href="{{ url_for('search') }}" class="btn btn-primary">Keep browsing</a>
+</div>
+
+{% include "footer.html" %}

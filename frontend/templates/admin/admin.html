@@ -1,62 +1,80 @@
 {% include "admin_header.html" %}
 
-<div class="card" style="width: 18rem;">
-	<div class="card-body">
-		<h5 class="card-title">Inapropriate</h5>
-		<a href="{{url_for('inapp')}}" class="btn btn-primary" text="view">view items</a>
-	</div>
+<h1 class="page-title">Admin console</h1>
+<p class="page-subtitle">Moderation, accounts and the category list.</p>
 
-	<div class="card-body">
-		<h5 class="card-title">Counterfeits</h5>
-		<a href="{{url_for('counter')}}" class="btn btn-primary" text="view">view items</a>
-	</div>
+<div class="card-grid">
+    <div class="card">
+        <div class="card-body">
+            <h2 class="card-title">Flagged items</h2>
+            <p class="card-description">Items users have reported, waiting on a decision.</p>
+            <a href="{{ url_for('inapp') }}" class="btn btn-primary btn-block-full">Inappropriate</a>
+            <a href="{{ url_for('counter') }}" class="btn btn-outline-secondary btn-block-full mt-2">Counterfeit</a>
+        </div>
+    </div>
 
-	<div class="card-body">
-		<h5 class="card-title">Delete User</h5>
-        <form action="/admin" method="POST">
-            <label for="user_id">user_id</label>
-            <input type="text" id='delete_user_id' name="delete_user_id">
-            <input type="submit" value="delete user">
-        </form>
-	</div>
+    <div class="card">
+        <div class="card-body">
+            <h2 class="card-title">Accounts</h2>
+            <p class="card-description">Suspend an account or remove it outright.</p>
+            <form action="/admin" method="POST">
+                <div class="field">
+                    <label for="delete_user_id">User id</label>
+                    <input type="text" id="delete_user_id" name="delete_user_id">
+                </div>
+                <button class="btn btn-danger btn-block-full" type="submit">Delete user</button>
+            </form>
+            <form action="/admin" method="POST" class="mt-2">
+                <div class="field">
+                    <label for="suspend_user_id">User id</label>
+                    <input type="text" id="suspend_user_id" name="suspend_user_id">
+                </div>
+                <button class="btn btn-outline-warning btn-block-full" type="submit">Suspend user</button>
+            </form>
+        </div>
+    </div>
 
-	<div class="card-body">
-		<h5 class="card-title">Suspend User</h5>
-        <form action="/admin" method="POST">
-            <label for="user_id">user_id</label>
-            <input type="text" id='suspend_user_id' name="suspend_user_id">
-            <input type="submit" value="suspend user">
-        </form>
-	</div>
+    <div class="card">
+        <div class="card-body">
+            <h2 class="card-title">Categories</h2>
+            <p class="card-description">A blacklisted category hides its items from search.</p>
+            <form action="/admin" method="POST">
+                <div class="field">
+                    <label for="category1">Current categories</label>
+                    <select id="category1" name="category1">
+                        {% for cat in categories %}
+                        <option value="{{ cat }}">{{ cat }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="field">
+                    <label for="categories">New category</label>
+                    <input type="text" id="categories" name="category2" placeholder="Type to add a category">
+                </div>
+                <div class="field">
+                    <label for="blacklisted">
+                        <input type="checkbox" checked="true" id="blacklisted" name="blacklisted">
+                        Blacklisted
+                    </label>
+                </div>
+                <button class="btn btn-primary" type="submit" name="add" value="add">Add</button>
+                <button class="btn btn-outline-secondary btn-sm" type="submit" name="edit" value="edit">Edit</button>
+                <button class="btn btn-outline-secondary btn-sm" type="submit" name="delete" value="delete">Delete</button>
+            </form>
+        </div>
+    </div>
 
-	<div class="card-body">
-		<h5 class="card-title">Categories</h5>
-        <form action="/admin" method="POST">
-            <label for="current categories">current categories</label>
-			<select name="category1" method="GET" action="/admin">
-				{% for cat in categories %}
-				<option value= "{{cat}}" SELECTED>{{cat}}</option>"
-				{% endfor %}
-			</select>
-            <input type="text" id='categories' name="category2" placeholder="type to add category">
-            <label for="user_id">blacklisted</label>
-			<input type="checkbox" checked="true" id='blacklisted' name="blacklisted">
-			<input type="submit" value="add" name='add'>
-			<input type="submit" value="delete" name='delete'>
-			<input type="submit" value="edit" name='edit'>
-        </form>
-	</div>
-
-	<div class="card-body">
-		<h5 class="card-title">See All Auctions in Sorted Order</h5>
-        <form action="/admin" method="POST">
-			<input type="submit" value="edit" name='see_auctions'>
-        </form>
-		{% if not auctions_ls %}
-		<h6> No current auctions to see. </h6>
-		{% endif%}
-	</div>
+    <div class="card">
+        <div class="card-body">
+            <h2 class="card-title">Auctions</h2>
+            <p class="card-description">Every open auction on the site, soonest to close first.</p>
+            <form action="/admin" method="POST">
+                <button class="btn btn-primary btn-block-full" type="submit" name="see_auctions" value="see_auctions">List auctions</button>
+            </form>
+        </div>
+    </div>
 </div>
-<script src="{{url_for('static', filename='js/auction.js')}}"></script>
+
+<script src="{{ url_for('static', filename='js/auction.js') }}"></script>
 
 {% include "admin_footer.html" %}

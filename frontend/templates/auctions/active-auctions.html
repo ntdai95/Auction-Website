@@ -1,3 +1,4 @@
+{% from "item_thumb.html" import item_thumb %}
 {% include "header.html" %}
 
 <h1 class="page-title">Active auctions</h1>
@@ -7,11 +8,12 @@
 <div class="card-grid">
     {% for item in auction_ls %}
     <div class="card">
+        {{ item_thumb(item, loop.index0) }}
         <div class="card-body">
             <h2 class="card-title">{{ item.name }}</h2>
             <p class="card-meta">
                 Auction #{{ item.auction_id }}
-                <span class="badge-pill badge-type">{{ item.auction_type }}</span>
+                <span class="badge-pill badge-type">{{ item.auction_type | replace("_", " ") | title }}</span>
                 {% if item.auction_status == "on" %}
                 <span class="badge-pill badge-live">Live</span>
                 {% else %}
@@ -23,22 +25,19 @@
 
             <div class="price-row">
                 <div class="price-block">
-                    <span class="label">Starting price</span>
-                    <span class="value">${{ item.price }}</span>
-                </div>
-                <div class="price-block">
-                    <span class="label">Current bid</span>
                     {% if item.current_bid %}
+                    <span class="label">Current bid</span>
                     <span class="value bid">${{ item.current_bid }}</span>
                     {% else %}
-                    <span class="value none">No bids yet</span>
+                    <span class="label">Asking price</span>
+                    <span class="value">${{ item.price }}</span>
                     {% endif %}
                 </div>
             </div>
 
             <div class="time-row">
-                <span>Opens {{ item.auction_start }}</span>
-                <span>Closes {{ item.auction_end }}</span>
+                <span>Opens {{ item.auction_start | auction_time }}</span>
+                <span>Closes {{ item.auction_end | auction_time }}</span>
             </div>
 
             {% if item.auction_status == "on" %}
