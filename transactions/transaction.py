@@ -51,13 +51,14 @@ class order:
         else:
             order_id += 1
 
-        self._add_order(order_id, user_id, items, order_status='"pending"')
-        total = 100
+        self._add_order(order_id, user_id, items, order_status="pending")
+        # the total used to be hardcoded to 100 regardless of the cart
+        total = sum(float(item[1]) for item in items)
         if self.__make_payment(user_id, total):
-            self._update_order(order_id, order_status='"SUCCESS"')
+            self._update_order(order_id, order_status="SUCCESS")
             status = 200
         else:
-            self._update_order(order_id, order_status='"FAIL"')
+            self._update_order(order_id, order_status="FAIL")
             status = 400
 
         cur.close()
@@ -66,12 +67,13 @@ class order:
 
     def _add_order(self, order_id, user_id, items, order_status="pending"):
         cur = self.conn.cursor()
+        status = 200
         for item in items:
             try:
                 cur.execute(
-                    f'''INSERT INTO db_order (order_id, user_id, item_id, price, order_time, order_status)
-                    VALUES ({order_id}, {user_id}, '{item[0]}',{item[1]},{"NOW()"},{order_status })''')
-                status = 200
+                    '''INSERT INTO db_order (order_id, user_id, item_id, price, order_time, order_status)
+                    VALUES (%s, %s, %s, %s, NOW(), %s)''',
+                    (order_id, user_id, item[0], item[1], order_status))
             except Exception as e:
                 print(e)
                 status = 400
@@ -83,9 +85,10 @@ class order:
         cur = self.conn.cursor()
         try:
             cur.execute(
-                f'''UPDATE db_order
-                SET order_status = {order_status}
-                WHERE order_id = {order_id};''')
+                '''UPDATE db_order
+                SET order_status = %s
+                WHERE order_id = %s;''',
+                (order_status, order_id))
 
             status = 200
         except Exception as e:
@@ -111,8 +114,9 @@ class cart:
         cur = self.conn.cursor()
         try:
             cur.execute(
-                f'''INSERT INTO db_cart
-                VALUES ('{item_id}', {user_id}, {price}, False, False);''')
+                '''INSERT INTO db_cart
+                VALUES (%s, %s, %s, False, False);''',
+                (item_id, user_id, price))
 
             status = 200
         except Exception:
@@ -127,8 +131,9 @@ class cart:
         cur = self.conn.cursor()
         try:
             cur.execute(
-                f'''DELETE FROM db_cart
-                WHERE user_id = {user_id} and item_id = '{item_id}';''')
+                '''DELETE FROM db_cart
+                WHERE user_id = %s and item_id = %s;''',
+                (user_id, item_id))
 
             status = 200
         except Exception as e:
@@ -144,8 +149,9 @@ class cart:
         if buy_Now:
             try:
                 cur.execute(
-                    f'''DELETE FROM db_cart
-                    WHERE user_id = {user_id} and later = 0;''')
+                    '''DELETE FROM db_cart
+                    WHERE user_id = %s and later = 0;''',
+                    (user_id,))
 
                 status = 200
             except Exception as e:
@@ -154,8 +160,9 @@ class cart:
         else:
             try:
                 cur.execute(
-                    f'''DELETE FROM db_cart
-                    WHERE user_id = {user_id};''')
+                    '''DELETE FROM db_cart
+                    WHERE user_id = %s;''',
+                    (user_id,))
 
                 status = 200
             except Exception as e:
@@ -170,8 +177,9 @@ class cart:
         cur = self.conn.cursor()
         try:
             cur.execute(
-                f'''DELETE FROM db_cart
-                WHERE item_id = '{item_id}';''')
+                '''DELETE FROM db_cart
+                WHERE item_id = %s;''',
+                (item_id,))
 
             status = 200
         except Exception as e:
@@ -207,14 +215,16 @@ class cart:
         cur = self.conn.cursor()
         if buy_now:
             cur.execute(
-                f'''SELECT item_id, price
+                '''SELECT item_id, price
                 FROM db_cart
-                WHERE user_id = {user_id} and later={False};''')
+                WHERE user_id = %s and later = False;''',
+                (user_id,))
         else:
             cur.execute(
-                f'''SELECT item_id, price
+                '''SELECT item_id, price
                 FROM db_cart
-                WHERE user_id = {user_id};''')
+                WHERE user_id = %s;''',
+                (user_id,))
 
         c = cur.fetchall()
         if not c:

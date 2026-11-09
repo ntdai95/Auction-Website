@@ -36,26 +36,18 @@ conn = connect_to_mysql(host="auctionsdb",
 
 
 def create(table, inputs):
-    values = []
-    for i in inputs.values():
-        if type(i) == str:
-            values.append(f"\"{i}\"")
-        elif i is None:
-            values.append("NULL")
-        elif type(i) == datetime.datetime:
-            dte = time.strftime('%Y-%m-%d %H:%M:%S', datetime.datetime.utcnow().timetuple())
-            values.append("\"" + str(dte) + "\"")
-        else:
-            values.append(str(i))
-
-    values = ",".join(values)
+    # the column names are the caller's dataclass fields, but the values can
+    # carry form input, so they are bound rather than pasted into the statement
+    columns = list(inputs.keys())
+    params = list(inputs.values())
+    placeholders = ",".join(["%s"] * len(columns))
     insert = \
     f"""
-    INSERT INTO {table} ({",".join(inputs.keys())})
-    VALUES ({values});
+    INSERT INTO {table} ({",".join(columns)})
+    VALUES ({placeholders});
     """
     cursor = conn.cursor()
-    cursor.execute(insert)
+    cursor.execute(insert, params)
     id = cursor.lastrowid
     conn.commit()
     return id

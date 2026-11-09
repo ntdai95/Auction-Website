@@ -35,116 +35,82 @@ conn = connect_to_mysql(host="itemsdb",
                         port=3317)
 
 
+# The column and table names below are the caller's own field names, not request
+# data, so they stay in the statement. Every value is bound as a parameter.
+
+
 def update(table, primary_key, key_value, column, column_value):
-    if type(key_value) == str:
-        key_value = "\"" + key_value + "\""
-
-    if type(column_value) == str:
-        column_value = "\"" + column_value + "\""
-
-    if column_value is None:
-        column_value = "NULL"
-
     if type(column_value) == datetime.datetime:
         column_value = time.strftime('%Y-%m-%d %H:%M:%S', column_value.timetuple())
 
     update = \
     f"""
     UPDATE {table}
-    SET {column} = {column_value}
-    WHERE {primary_key} = {key_value};
+    SET {column} = %s
+    WHERE {primary_key} = %s;
     """
     cursor = conn.cursor()
-    cursor.execute(update)
+    cursor.execute(update, (column_value, key_value))
     conn.commit()
 
 def batch_update(table, primary_key, key_value, columns=[], column_values=[]):
-    values = []
+    params = []
     for i in column_values:
-        bls =  ["False", "True", False, True]
+        bls = ["False", "True", False, True]
         if i in bls:
-            v = bls.index(i) % 2
-            values.append(str(bool(v)))
-        elif type(i) == str:
-            values.append(f"\"{i}\"")
+            params.append(bls.index(i) % 2)
         elif type(i) == list:
-            val = ' | '.join(i)
-            values.append(val)
+            params.append(' | '.join(i))
         else:
-            values.append(str(i))
+            params.append(i)
 
-    paired = ""
-    for i, col in enumerate(columns):
-        p = col + "=" + (values[i] or "NULL")
-        paired += p + ","
-
-    paired = paired.strip(",")
-    if type(key_value) == str:
-        key_value = "\"" + key_value + "\""
-
-    update= \
+    paired = ",".join(f"{col}=%s" for col in columns)
+    update = \
     f"""
     UPDATE {table}
     SET {paired}
-    WHERE {primary_key} ={key_value};
+    WHERE {primary_key} = %s;
     """
+    params.append(key_value)
     cursor = conn.cursor()
-    cursor.execute(update)
+    cursor.execute(update, params)
     conn.commit()
 
 def create(table, inputs):
-    values = []
-    for i in inputs.values():
-        if type(i) == str:
-            values.append(f"\"{i}\"")
-        elif i is None:
-            values.append("NULL")
-        elif type(i) == datetime.datetime:
-            dte = time.strftime('%Y-%m-%d %H:%M:%S', datetime.datetime.utcnow().timetuple())
-            values.append("\"" + str(dte) + "\"")
-        else:
-            values.append(str(i))
-
-    values = ",".join(values)
+    columns = list(inputs.keys())
+    params = list(inputs.values())
+    placeholders = ",".join(["%s"] * len(columns))
     insert = \
     f"""
-    INSERT INTO {table} ({",".join(inputs.keys())})
-    VALUES ({values});
+    INSERT INTO {table} ({",".join(columns)})
+    VALUES ({placeholders});
     """
     cursor = conn.cursor()
-    cursor.execute(insert)
+    cursor.execute(insert, params)
     conn.commit()
 
 def delete(from_table, primary_key, key_value):
-    if type(key_value) == str:
-        key_value = "\"" + key_value + "\""
-
     delete = \
     f"""
     DELETE FROM {from_table}
-    WHERE {primary_key}={key_value};
+    WHERE {primary_key}=%s;
     """
     cursor = conn.cursor()
-    cursor.execute(delete)
+    cursor.execute(delete, (key_value,))
     conn.commit()
 
 def read(table, primary_key, key_value, columns=None, as_dict=False):
-    cols = None
-    if type(key_value) == str:
-        key_value = "\"" + key_value + "\""
-
-    if columns:
-        cols = ','.join(columns)
+    cols = ','.join(columns) if columns else "*"
 
     get = \
     f"""
-    SELECT {cols or "*"}
+    SELECT {cols}
     FROM {table}
     WHERE
-        {primary_key} = {key_value}
+        {primary_key} = %s
     """
     cursor = conn.cursor()
-    cursor.execute(get)
+    cursor.execute(get, (key_value,))
     rows = cursor.fetchall()
     if as_dict:
         names = [d[0] for d in cursor.description]
@@ -153,26 +119,16 @@ def read(table, primary_key, key_value, columns=None, as_dict=False):
     return rows
 
 def search(table, primary_key, properties, search_values):
-    values = []
-    for i in search_values:
-        if not i:
-            values.append("NULL")
-        elif type(i) == datetime.datetime:
-            dte = time.strftime('%Y-%m-%d %H:%M:%S', datetime.datetime.utcnow().timetuple())
-            values.append("\"" + str(dte) + "\"")
-        else:
-            values.append(str(i))
-
     search_keys = []
-    for i in zip(properties, values):
-        a, b = i
+    params = []
+    for a, b in zip(properties, search_values):
         if a == 'price':
-            min, max = b
-            s = f"{a} BETWEEN {min} AND {max}"
+            low, high = b
+            search_keys.append(f"{a} BETWEEN %s AND %s")
+            params.extend([low, high])
         else:
-            s = f"{a} LIKE \'%{b}%\'"
-
-        search_keys.append(s)
+            search_keys.append(f"{a} LIKE %s")
+            params.append(f"%{b}%")
 
     search = \
     f"""
@@ -181,5 +137,5 @@ def search(table, primary_key, properties, search_values):
     WHERE {" AND ".join(search_keys)} AND sold = 0;
     """
     cursor = conn.cursor()
-    cursor.execute(search)
+    cursor.execute(search, params)
     return cursor.fetchall()

@@ -34,80 +34,57 @@ conn = connect_to_mysql(host="watchlistdb",
                         port=3321)
 
 
-def create(table, inputs):
-    values = []
-    for i in inputs.values():
-        if type(i) == str:
-            values.append(f"\"{i}\"")
-        elif i is None:
-            values.append("NULL")
-        elif type(i) == datetime.datetime:
-            dte = time.strftime('%Y-%m-%d %H:%M:%S', datetime.datetime.utcnow().timetuple())
-            values.append("\"" + str(dte) + "\"")
-        else:
-            values.append(str(i))
+# The column and table names below are the caller's own field names, not request
+# data, so they stay in the statement. Every value is bound as a parameter.
 
-    values = ",".join(values)
+
+def create(table, inputs):
+    columns = list(inputs.keys())
+    params = list(inputs.values())
+    placeholders = ",".join(["%s"] * len(columns))
     insert = \
     f"""
-    INSERT INTO {table} ({",".join(inputs.keys())})
-    VALUES ({values});
+    INSERT INTO {table} ({",".join(columns)})
+    VALUES ({placeholders});
     """
     cursor = conn.cursor()
-    cursor.execute(insert)
+    cursor.execute(insert, params)
     conn.commit()
 
 def delete(from_table, primary_key, key_value):
-    if type(key_value) == str:
-        key_value = "\"" + key_value + "\""
-
     delete = \
     f"""
     DELETE FROM {from_table}
-    WHERE {primary_key} = {key_value};
+    WHERE {primary_key} = %s;
     """
     cursor = conn.cursor()
-    cursor.execute(delete)
+    cursor.execute(delete, (key_value,))
     conn.commit()
 
 def read(table, primary_key, key_value, columns=None):
-    cols = None
-    if type(key_value) == str:
-        key_value = "\"" + key_value + "\""
-
-    if columns:
-        cols = ','.join(columns)
+    cols = ','.join(columns) if columns else "*"
 
     get = \
     f"""
-    SELECT {cols or "*"}
+    SELECT {cols}
     FROM {table}
-    WHERE {primary_key} = {key_value};
+    WHERE {primary_key} = %s;
     """
     cursor = conn.cursor()
-    cursor.execute(get)
+    cursor.execute(get, (key_value,))
     return cursor.fetchall()
 
 def search(table, primary_key, properties, search_values):
-    values = []
-    for i in search_values:
-        if not i:
-            values.append("NULL")
-        elif type(i) == datetime.datetime:
-            dte = time.strftime('%Y-%m-%d %H:%M:%S', datetime.datetime.utcnow().timetuple())
-            values.append("\"" + str(dte) + "\"")
-        else:
-            values.append(str(i))
-
     search_keys = []
-    for a, b in zip(properties, values):
-        if a =='price':
-            min, max = b
-            s = f"{a} BETWEEN {min} AND {max}"
+    params = []
+    for a, b in zip(properties, search_values):
+        if a == 'price':
+            low, high = b
+            search_keys.append(f"{a} BETWEEN %s AND %s")
+            params.extend([low, high])
         else:
-            s = f"{a} LIKE \'%{b}%\'"
-
-        search_keys.append(s)
+            search_keys.append(f"{a} LIKE %s")
+            params.append(f"%{b}%")
 
     search = \
     f"""
@@ -116,5 +93,5 @@ def search(table, primary_key, properties, search_values):
     WHERE {" AND ".join(search_keys)};
     """
     cursor = conn.cursor()
-    cursor.execute(search)
+    cursor.execute(search, params)
     return cursor.fetchall()
