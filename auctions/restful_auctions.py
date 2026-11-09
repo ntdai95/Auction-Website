@@ -82,7 +82,7 @@ def CreateNewBid():
 
         requests.post(f"http://watchlist:3311/watchlist/process?item_id={data['item_id']}&change_type=1&property=price&value={data['bid_price']}")
         requests.post(f"http://items:3307/item/edit?item_id={data['item_id']}&properties=price&values={data['bid_price']}")
-    except:
+    except Exception:
         return jsonify({"status": "fail", "message": "error in insertion of bid"})
 
     try:
@@ -93,7 +93,7 @@ def CreateNewBid():
             fact="dict")
 
         res2["status"] = "success"
-    except:
+    except Exception:
         return jsonify({"status": "fail", "message": "error in retrieval of bid"})
 
     return jsonify(res2)
@@ -259,7 +259,7 @@ def view_auction(auction_id):
                 [auction_id],
                 res="one",
                 fact="dict")
-        except:
+        except Exception:
             return jsonify({"status": "fail", "message": "Error in processing winner."})
 
         res = {"highest_bids": bid_res, **auction_res}
@@ -305,7 +305,7 @@ def change_auction():
         _auction_type = data["auction_type"]
         _auction_start = f"{data['start_date']} {data['start_time']}:00"
         _auction_end = f"{data['end_date']} {data['end_time']}:00"
-    except:
+    except Exception:
         return jsonify({"status": "fail", "message": "not all form variables were returned."})
 
     do_query(
@@ -323,7 +323,7 @@ def view_auction_by_item_id(item_id):
             [item_id],
             res="one",
             fact="dict")
-    except:
+    except Exception:
         return jsonify({"status": "fail", "message": "issue receiving auction details"})
 
     if not auction_res:

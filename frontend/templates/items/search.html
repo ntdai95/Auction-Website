@@ -17,9 +17,7 @@
 <div class="card-grid">
     {% for item in item_ls %}
     <div class="card">
-        <img class="card-img-top" style="width: 100%; height: 170px; object-fit: cover;"
-             src="{{ url_for('static', filename='images/250px-Nintendo-Game-Boy-Advance-Purple-FL.jpeg') }}"
-             alt="{{ item.name }}">
+        <div class="thumb thumb-{{ (loop.index0 % 6) + 1 }}">{{ (item.name | string)[:1] | upper }}</div>
         <div class="card-body">
             <h2 class="card-title">{{ item.name }}</h2>
             {% if item.categories %}
@@ -47,13 +45,16 @@
             <a href="{{ item.html }}" class="btn btn-primary btn-block-full">Go to auction</a>
             {% endif %}
 
-            <div class="d-grid gap-2 mt-2">
-                <a href="http://localhost:3305/cart/addCart/{{ item.item_id }}" class="need_id_path btn btn-outline-primary btn-sm">Buy now</a>
-                <a href="http://localhost:3307/item/{{ item.item_id }}" class="btn btn-outline-secondary btn-sm">Item page</a>
-                <a href="http://localhost:3311/watchlist/add?item_id={{ item.item_id }}&user_id=" class="need_id btn btn-outline-secondary btn-sm">Add to watchlist</a>
-                <a href="http://localhost:3311/watchlist/remove?item_id={{ item.item_id }}&user_id=" class="need_id btn btn-outline-secondary btn-sm">Remove from watchlist</a>
-                <a href="http://localhost:3307/item/report_inappropriate?item_id={{ item.item_id }}" class="btn btn-outline-warning btn-sm">Report inappropriate</a>
-                <a href="http://localhost:3307/item/report_counterfeit?item_id={{ item.item_id }}" class="btn btn-outline-warning btn-sm">Report counterfeit</a>
+            <a href="http://localhost:3305/cart/addCart/{{ item.item_id }}" class="need_id_path btn btn-primary btn-block-full">Buy now</a>
+
+            <div class="action-row">
+                <a href="http://localhost:3307/item/{{ item.item_id }}">Item page</a>
+                <a href="http://localhost:3311/watchlist/add?item_id={{ item.item_id }}&user_id=" class="need_id">Watch</a>
+                <a href="http://localhost:3311/watchlist/remove?item_id={{ item.item_id }}&user_id=" class="need_id">Unwatch</a>
+            </div>
+            <div class="action-row muted">
+                <a href="http://localhost:3307/item/report_inappropriate?item_id={{ item.item_id }}">Report inappropriate</a>
+                <a href="http://localhost:3307/item/report_counterfeit?item_id={{ item.item_id }}">Report counterfeit</a>
             </div>
         </div>
     </div>

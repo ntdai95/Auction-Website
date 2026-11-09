@@ -387,3 +387,92 @@ a {
         gap: 14px;
     }
 }
+
+/* ------------------------------------------------------------ thumbnail --- */
+
+/* Items carry no image of their own, so each card gets a generated tile built
+   from the item's initial. A single stock photo on every card implied the
+   wrong thing: a camera listing showed a games console. */
+
+.thumb {
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.6rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: .5px;
+    text-shadow: 0 1px 2px rgba(16, 23, 42, .25);
+    background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
+}
+
+.thumb-1 { background: linear-gradient(135deg, #2a78d6 0%, #1f5ea8 100%); }
+.thumb-2 { background: linear-gradient(135deg, #1baf7a 0%, #14805a 100%); }
+.thumb-3 { background: linear-gradient(135deg, #eb6834 0%, #c24a1d 100%); }
+.thumb-4 { background: linear-gradient(135deg, #6250d6 0%, #4336a6 100%); }
+.thumb-5 { background: linear-gradient(135deg, #0f766e 0%, #0b544e 100%); }
+.thumb-6 { background: linear-gradient(135deg, #b4530a 0%, #8a3f08 100%); }
+
+/* --------------------------------------------------------- interaction --- */
+
+.card {
+    transition: transform .14s ease, box-shadow .14s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(16, 23, 42, .07), 0 12px 24px rgba(16, 23, 42, .09);
+}
+
+.site-nav {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+}
+
+.page-title {
+    letter-spacing: -.01em;
+}
+
+/* ---------------------------------------------------------- action row --- */
+
+/* Secondary actions sit on one line as links. As six stacked buttons they
+   made every card about twice as tall as its content needed. */
+
+.action-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 14px;
+    margin-top: 10px;
+    font-size: .84rem;
+}
+
+.action-row a {
+    text-decoration: none;
+}
+
+.action-row a:hover {
+    text-decoration: underline;
+}
+
+.action-row.muted {
+    margin-top: 6px;
+    font-size: .78rem;
+}
+
+.action-row.muted a {
+    color: var(--ink-soft);
+}
+
+.action-row.muted a:hover {
+    color: var(--warn);
+}

@@ -99,7 +99,7 @@ class order:
         try:
             time.sleep(3)
             return True
-        except:
+        except Exception:
             return False
 
 class cart:
@@ -115,7 +115,7 @@ class cart:
                 VALUES ('{item_id}', {user_id}, {price}, False, False);''')
 
             status = 200
-        except:
+        except Exception:
             print("Duplicated key!")
             status = 400
 
@@ -194,7 +194,7 @@ class cart:
             for item in items:
                 try:
                     self._deleteCart_by_item(item[0])
-                except:
+                except Exception:
                     pass
 
             status = 200

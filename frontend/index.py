@@ -87,7 +87,7 @@ def sign_up():
                 return redirect("/")
             else:
                 return render_template("users/sign-up.html", error=True)
-        except:    
+        except Exception:
             return render_template("users/sign-up.html", error=True)
 
 
@@ -114,8 +114,14 @@ def my_items(user_id):
     else:
         auction_res = auction_res.json()
         for item in items:
-            if item["item_id"] in auction_res:
-                item["auction_id"] = auction_res[item["item_id"]]
+            # the auctions service returns the whole auction row per item, so
+            # the id has to be read out of it. Assigning the row itself left
+            # the template building a link from a dict.
+            auction = auction_res.get(item["item_id"])
+            if auction:
+                item["auction_id"] = auction["auction_id"]
+                item["auction_start"] = auction["auction_start"]
+                item["auction_end"] = auction["auction_end"]
 
     return render_template("items/myitems.html", item_ls=items)
 
@@ -206,7 +212,7 @@ def view_participating_auctions(user_id):
     res= requests.get(f'http://{auctions_conf["host"]}:{auctions_conf["port"]}/view-active/{user_id}')
     try:
         user_auction_ls = res.json()["auctions"]
-    except:
+    except Exception:
         return render_template("auctions/active-auctions.html", auction_ls=[])
 
     # the auctions service returns the auction row on its own, so the item name
@@ -364,7 +370,7 @@ def cart(user_id):
             total += Decimal(item.json()['gotten']['price'])
 
         return render_template("transactions/cart.html", cart_ls=item_list, total=total)
-    except:
+    except Exception:
        return render_template("transactions/nullCart.html")
 
 
@@ -388,7 +394,7 @@ def order(user_id):
             total += Decimal(item.json()['gotten']['price'])
 
         return render_template("transactions/order.html", cart_ls=item_list, total=total)
-    except:
+    except Exception:
         return render_template("transactions/nullCart.html")
 
 
@@ -401,7 +407,7 @@ def order_complete(user_id):
         for each in res:
             parameters = {'item_id': each[0], 'properties': 'sold','values': 1}
             requests.post(f'http://{items_conf["host"]}:{items_conf["port"]}/item/edit', params=parameters)
-    except:
+    except Exception:
         pass
 
     return render_template("transactions/order_complete.html")
@@ -472,7 +478,7 @@ def inapp():
         try:
             if a:
                 items_ls.append(a['gotten'])
-        except:
+        except Exception:
             pass
 
     return render_template("admin/inapp.html", items_ls=items_ls)
@@ -486,7 +492,7 @@ def counter():
         try:
             if a:
                 items_ls.append(a['gotten'])
-        except:
+        except Exception:
             pass
 
     return render_template("admin/counter.html", items_ls=items_ls)

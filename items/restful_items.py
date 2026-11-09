@@ -16,7 +16,7 @@ def test():
 def item(item_id):
     try:
         return jsonify({"gotten": Item.load(item_id)})
-    except:
+    except Exception:
         return jsonify({"status": "fail", "message": "Bad Request"})
 
 @app.route("/item/delete", methods=['DELETE','GET'])
@@ -133,7 +133,7 @@ def add_item_category():
         try:
             Categories.add_item_category(category, blacklisted, created_by)
             return {"created": category}
-        except:
+        except Exception:
             return {"failed": category}
 
     return jsonify("Bad Request")
@@ -153,7 +153,7 @@ def modify_item_category():
         try:
             Categories.modify_item_category(category, property, value)
             return jsonify({category: "success"})
-        except:
+        except Exception:
             return jsonify({category: "edit failed"})
 
     return jsonify("Bad Request")
@@ -165,7 +165,7 @@ def delete_item_category():
         try:
             Categories.remove_item_category(category)
             return {category: "deleted"}
-        except:
+        except Exception:
             return {category: "failed"}
     else:
         return jsonify("Bad Request")

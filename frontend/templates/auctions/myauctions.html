@@ -7,9 +7,7 @@
 <div class="card-grid">
     {% for item in auction_ls %}
     <div class="card">
-        <img class="card-img-top" style="width: 100%; height: 170px; object-fit: cover;"
-             src="{{ url_for('static', filename='images/250px-Nintendo-Game-Boy-Advance-Purple-FL.jpeg') }}"
-             alt="Item {{ item.item_id }}">
+        <div class="thumb thumb-{{ (loop.index0 % 6) + 1 }}">{{ (item.item_id | string)[:1] | upper }}</div>
         <div class="card-body">
             <h2 class="card-title">Auction #{{ item.auction_id }}</h2>
             <p class="card-meta">
