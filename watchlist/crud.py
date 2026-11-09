@@ -34,12 +34,35 @@ conn = connect_to_mysql(host="watchlistdb",
                         port=3321)
 
 
-# The column and table names below are the caller's own field names, not request
-# data, so they stay in the statement. Every value is bound as a parameter.
+# Every value below is bound as a parameter. Column and table names cannot be
+# bound, so any that could come from request data are checked against the
+# table's real columns before they reach a statement.
+
+_column_cache = {}
+
+
+def _known_columns(table):
+    if table not in _column_cache:
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT column_name FROM information_schema.columns "
+            "WHERE table_schema = DATABASE() AND table_name = %s",
+            (table,))
+        _column_cache[table] = {row[0].lower() for row in cursor.fetchall()}
+
+    return _column_cache[table]
+
+
+def _check_identifiers(table, columns):
+    known = _known_columns(table)
+    for column in columns:
+        if str(column).lower() not in known:
+            raise ValueError(f"unknown column {column!r} for table {table!r}")
 
 
 def create(table, inputs):
     columns = list(inputs.keys())
+    _check_identifiers(table, columns)
     params = list(inputs.values())
     placeholders = ",".join(["%s"] * len(columns))
     insert = \
@@ -75,6 +98,7 @@ def read(table, primary_key, key_value, columns=None):
     return cursor.fetchall()
 
 def search(table, primary_key, properties, search_values):
+    _check_identifiers(table, properties)
     search_keys = []
     params = []
     for a, b in zip(properties, search_values):

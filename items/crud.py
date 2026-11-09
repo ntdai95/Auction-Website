@@ -35,11 +35,36 @@ conn = connect_to_mysql(host="itemsdb",
                         port=3317)
 
 
-# The column and table names below are the caller's own field names, not request
-# data, so they stay in the statement. Every value is bound as a parameter.
+# Every value below is bound as a parameter. Column and table names cannot be
+# bound, so the ones that can come from request data (the search fields and the
+# item properties a form posts) are checked against the table's real columns
+# before they reach a statement.
+
+_column_cache = {}
+
+
+def _known_columns(table):
+    if table not in _column_cache:
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT column_name FROM information_schema.columns "
+            "WHERE table_schema = DATABASE() AND table_name = %s",
+            (table,))
+        _column_cache[table] = {row[0].lower() for row in cursor.fetchall()}
+
+    return _column_cache[table]
+
+
+def _check_identifiers(table, columns):
+    known = _known_columns(table)
+    for column in columns:
+        if str(column).lower() not in known:
+            raise ValueError(f"unknown column {column!r} for table {table!r}")
 
 
 def update(table, primary_key, key_value, column, column_value):
+    _check_identifiers(table, [column, primary_key])
+
     if type(column_value) == datetime.datetime:
         column_value = time.strftime('%Y-%m-%d %H:%M:%S', column_value.timetuple())
 
@@ -54,6 +79,7 @@ def update(table, primary_key, key_value, column, column_value):
     conn.commit()
 
 def batch_update(table, primary_key, key_value, columns=[], column_values=[]):
+    _check_identifiers(table, list(columns) + [primary_key])
     params = []
     for i in column_values:
         bls = ["False", "True", False, True]
@@ -78,6 +104,7 @@ def batch_update(table, primary_key, key_value, columns=[], column_values=[]):
 
 def create(table, inputs):
     columns = list(inputs.keys())
+    _check_identifiers(table, columns)
     params = list(inputs.values())
     placeholders = ",".join(["%s"] * len(columns))
     insert = \
@@ -119,6 +146,7 @@ def read(table, primary_key, key_value, columns=None, as_dict=False):
     return rows
 
 def search(table, primary_key, properties, search_values):
+    _check_identifiers(table, properties)
     search_keys = []
     params = []
     for a, b in zip(properties, search_values):

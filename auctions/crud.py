@@ -35,10 +35,33 @@ conn = connect_to_mysql(host="auctionsdb",
                         port=3328)
 
 
+_column_cache = {}
+
+
+def _known_columns(table):
+    if table not in _column_cache:
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT column_name FROM information_schema.columns "
+            "WHERE table_schema = DATABASE() AND table_name = %s",
+            (table,))
+        _column_cache[table] = {row[0].lower() for row in cursor.fetchall()}
+
+    return _column_cache[table]
+
+
+def _check_identifiers(table, columns):
+    known = _known_columns(table)
+    for column in columns:
+        if str(column).lower() not in known:
+            raise ValueError(f"unknown column {column!r} for table {table!r}")
+
+
 def create(table, inputs):
-    # the column names are the caller's dataclass fields, but the values can
-    # carry form input, so they are bound rather than pasted into the statement
+    # the column names are the caller's own field names and the values can carry
+    # form input, so the names are checked and every value is bound
     columns = list(inputs.keys())
+    _check_identifiers(table, columns)
     params = list(inputs.values())
     placeholders = ",".join(["%s"] * len(columns))
     insert = \

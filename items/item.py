@@ -71,7 +71,7 @@ class Item:
         self.batch_edit(['inappropriate'], [False])
 
     def set_inappropriate_flag(self):
-        self.counterfeit = True
+        self.inappropriate = True
         self.batch_edit(['inappropriate'], [True])
         client = MessageRpcClient()
         client.NotifyAdmins(self.item_id, 'inappropriate')
@@ -88,10 +88,17 @@ class Item:
 
     @staticmethod
     def view_flagged_items(field, user_id=None):
+        # field names a column, so it is checked against the two flag columns
+        # rather than pasted into the statement; the user id is bound
+        if field not in ("inappropriate", "counterfeit"):
+            raise ValueError(f"not a flag column: {field!r}")
+
         if user_id:
-            where = f"user_id = \'{user_id}\' AND {field}=TRUE"
+            where = f"user_id = %s AND {field} = TRUE"
+            params = (user_id,)
         else:
-            where = f"{field}= TRUE"
+            where = f"{field} = TRUE"
+            params = ()
 
         flagged = \
         f"""
@@ -100,7 +107,7 @@ class Item:
         WHERE {where}
         """
         cursor = crud.conn.cursor()
-        cursor.execute(flagged)
+        cursor.execute(flagged, params)
         items = cursor.fetchall()
         return tuple([i[0] for i in items])
 
@@ -131,13 +138,13 @@ class Item:
     @staticmethod
     def check_unique_item_id(item_id):
         unique = \
-        f"""
+        """
         SELECT COUNT(1)
         FROM items
-        WHERE item_id = \"{item_id}\";
+        WHERE item_id = %s;
         """
         cursor = crud.conn.cursor()
-        cursor.execute(unique)
+        cursor.execute(unique, (item_id,))
         return not bool(cursor.fetchone()[0])
 
     @staticmethod

@@ -90,10 +90,14 @@ def check_inappropriateness():
 def view_flagged_items():
     user = request.args.get('user_id', None)
     field = request.args.get('field', None)
-    if user:
-        return jsonify(Item.view_flagged_items(field, user))
-    else:
+    try:
+        if user:
+            return jsonify(Item.view_flagged_items(field, user))
+
         return jsonify(Item.view_flagged_items(field=field))
+    except ValueError:
+        # field must name one of the flag columns
+        return jsonify([]), 400
 
 @app.route("/items/allitems", methods=['GET'])
 def getitems():
@@ -110,7 +114,13 @@ def getitems():
 def search():
     params = request.args.getlist('params')
     values = request.args.getlist('values')
-    item_ids = Item.search_for_item(params=params, values=values)
+    try:
+        # a search on a field that is not a column is a bad request, not a
+        # server error
+        item_ids = Item.search_for_item(params=params, values=values)
+    except ValueError:
+        return jsonify({'items': [], 'error': 'unknown search field'}), 400
+
     items = []
     for i in item_ids:
         x = vars(Item.load(i))
