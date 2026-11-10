@@ -1,4 +1,4 @@
-# Auctioneer
+# Auction Marketplace Microservices
 
 An auction marketplace split into six Flask REST services, each owning its own
 datastore, so a schema change in one service cannot break the services that call it.
