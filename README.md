@@ -6,7 +6,7 @@ Five sit behind their own MySQL database and the messaging service uses MongoDB.
 Messages travel between services over RabbitMQ. The whole thing runs as 14 Docker
 containers on a shared bridge network.
 
-Built at the University of Chicago in a team of four.
+This project was completed by a team of four for Topics in Software Engineering (MPCS 51205) at the University of Chicago.
 
 ## Demo
 
